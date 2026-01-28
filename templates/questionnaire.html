@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анкетирование</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="page-questionnaire">
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-spa"></i>
+                <span>Мир спокойствия</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/breathing">Дыхание</a></li>
+                <li><a href="/techniques">Техники</a></li>
+                <li><a href="/statistics">Статистика</a></li>
+                <li><a href="/questionnaire">Анкета</a></li>
+                <li><a href="/journal">Журнал</a></li>
+                <li><a href="/media">Медиа</a></li>
+                <li><a href="/emergency">Помощь</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title"><i class="fas fa-clipboard-check"></i> Анкетирование</h1>
+
+        <div class="questionnaire-section">
+            <h2>Оцените ваше состояние ДО практики</h2>
+
+            <div class="scale-item">
+                <label>Уровень тревожности:</label>
+                <input type="range" id="anxiety-before" min="0" max="10" value="5">
+                <div class="scale-labels">
+                    <span>Спокойствие</span>
+                    <span>Умеренно</span>
+                    <span>Сильная тревога</span>
+                </div>
+            </div>
+
+            <div class="scale-item">
+                <label>Уровень стресса:</label>
+                <input type="range" id="stress-before" min="0" max="10" value="5">
+                <div class="scale-labels">
+                    <span>Расслаблен</span>
+                    <span>Средне</span>
+                    <span>Сильный стресс</span>
+                </div>
+            </div>
+
+            <div class="scale-item">
+                <label>Настроение:</label>
+                <input type="range" id="mood-before" min="0" max="10" value="5">
+                <div class="scale-labels">
+                    <span>Плохое</span>
+                    <span>Нормальное</span>
+                    <span>Отличное</span>
+                </div>
+            </div>
+
+            <label>Что вы чувствуете в данный момент?</label>
+            <textarea id="feelings-before" placeholder="Опишите ваши ощущения..."></textarea>
+        </div>
+
+        <div class="questionnaire-section">
+            <h2>Оцените ваше состояние ПОСЛЕ практики</h2>
+
+            <div class="scale-item">
+                <label>Уровень тревожности:</label>
+                <input type="range" id="anxiety-after" min="0" max="10" value="5">
+                <div class="scale-labels">
+                    <span>Спокойствие</span>
+                    <span>Умеренно</span>
+                    <span>Сильная тревога</span>
+                </div>
+            </div>
+
+            <div class="scale-item">
+                <label>Уровень стресса:</label>
+                <input type="range" id="stress-after" min="0" max="10" value="5">
+                <div class="scale-labels">
+                    <span>Расслаблен</span>
+                    <span>Средне</span>
+                    <span>Сильный стресс</span>
+                </div>
+            </div>
+
+            <div class="scale-item">
+                <label>Настроение:</label>
+                <input type="range" id="mood-after" min="0" max="10" value="5">
+                <div class="scale-labels">
+                    <span>Плохое</span>
+                    <span>Нормальное</span>
+                    <span>Отличное</span>
+                </div>
+            </div>
+
+            <label>Как изменились ваши ощущения?</label>
+            <textarea id="feelings-after" placeholder="Опишите изменения..."></textarea>
+
+            <label>Какая техника вам помогла больше всего?</label>
+            <select id="technique">
+                <option value="breathing-4-7-8">Дыхание 4-7-8</option>
+                <option value="breathing-square">Квадратное дыхание</option>
+                <option value="muscle-relaxation">Мышечная релаксация</option>
+                <option value="grounding">Техника заземления</option>
+                <option value="meditation">Медитация</option>
+            </select>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <button class="btn-submit" onclick="submitQuestionnaire()">
+            <i class="fas fa-paper-plane"></i> Отправить анкету
+        </button>
+
+        <div style="text-align: center; margin-top: 2rem; color: #666;">
+            <p><small>Ваши ответы помогут нам улучшить сервис. Все данные анонимны.</small></p>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        function submitQuestionnaire() {
+            const questionnaire = {
+                before: {
+                    anxiety: document.getElementById('anxiety-before').value,
+                    stress: document.getElementById('stress-before').value,
+                    mood: document.getElementById('mood-before').value,
+                    feelings: document.getElementById('feelings-before').value
+                },
+                after: {
+                    anxiety: document.getElementById('anxiety-after').value,
+                    stress: document.getElementById('stress-after').value,
+                    mood: document.getElementById('mood-after').value,
+                    feelings: document.getElementById('feelings-after').value
+                },
+                technique: document.getElementById('technique').value,
+                timestamp: new Date().toISOString()
+            };
+
+            fetch('/api/submit-feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(questionnaire)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const message = document.getElementById('message');
+                    message.textContent = data.message;
+                    message.className = 'message success';
+                    message.style.display = 'block';
+
+                    if (data.status === 'success') {
+                        document.querySelectorAll('input[type="range"]').forEach(input => input.value = 5);
+                        document.querySelectorAll('textarea').forEach(ta => ta.value = '');
+                    }
+                })
+                .catch(error => {
+                    const message = document.getElementById('message');
+                    message.textContent = 'Ошибка отправки анкеты';
+                    message.className = 'message error';
+                    message.style.display = 'block';
+                });
+        }
+    </script>
+</body>
+
+</html>

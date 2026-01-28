@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный журнал</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="page-journal">
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-spa"></i>
+                <span>Мир спокойствия</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/breathing">Дыхание</a></li>
+                <li><a href="/techniques">Техники</a></li>
+                <li><a href="/statistics">Статистика</a></li>
+                <li><a href="/questionnaire">Анкета</a></li>
+                <li><a href="/journal">Журнал</a></li>
+                <li><a href="/media">Медиа</a></li>
+                <li><a href="/emergency">Помощь</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title"><i class="fas fa-book"></i> Личный журнал ощущений</h1>
+
+        <div class="journal-editor">
+            <h2>Новая запись</h2>
+
+            <div>
+                <label>Как вы себя чувствуете?</label>
+                <div class="mood-selector">
+                    <button class="mood-btn" data-mood="happy">😊 Счастлив</button>
+                    <button class="mood-btn" data-mood="calm">😌 Спокоен</button>
+                    <button class="mood-btn active" data-mood="neutral">😐 Нейтрально</button>
+                    <button class="mood-btn" data-mood="anxious">😟 Тревожно</button>
+                    <button class="mood-btn" data-mood="stressed">😫 Стресс</button>
+                    <button class="mood-btn" data-mood="angry">😠 Злость</button>
+                </div>
+            </div>
+
+            <textarea id="journal-text"
+                placeholder="Опишите ваши мысли, чувства и ощущения. Что вызвало эти эмоции? Как вы справляетесь?"></textarea>
+
+            <div id="message" class="message"></div>
+
+            <button class="btn-submit" onclick="saveJournalEntry()">
+                <i class="fas fa-save"></i> Сохранить запись
+            </button>
+        </div>
+
+        <div class="journal-entries">
+            <h2>Мои записи</h2>
+            <div id="entries-container">
+                <!-- Записи будут загружаться здесь -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        let selectedMood = 'neutral';
+
+        // Инициализация выбора настроения
+        document.querySelectorAll('.mood-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedMood = this.getAttribute('data-mood');
+            });
+        });
+
+        function saveJournalEntry() {
+            const entry = {
+                text: document.getElementById('journal-text').value,
+                mood: selectedMood,
+                timestamp: new Date().toISOString()
+            };
+
+            if (!entry.text.trim()) {
+                showMessage('Пожалуйста, напишите что-нибудь', 'error');
+                return;
+            }
+
+            fetch('/api/submit-journal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(entry)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showMessage('Запись сохранена успешно!', 'success');
+                        document.getElementById('journal-text').value = '';
+                        loadJournalEntries();
+                    } else {
+                        showMessage('Ошибка сохранения: ' + data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    showMessage('Ошибка соединения с сервером', 'error');
+                });
+        }
+
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = 'message ' + type;
+            message.style.display = 'block';
+
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+
+        function loadJournalEntries() {
+            fetch('/api/journal')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('entries-container');
+                    if (data.status === 'success' && data.entries && data.entries.length > 0) {
+                        container.innerHTML = '';
+                        data.entries.forEach(entry => {
+                            const date = new Date(entry.timestamp);
+                            const moodIcons = {
+                                'happy': '😊',
+                                'calm': '😌',
+                                'neutral': '😐',
+                                'anxious': '😟',
+                                'stressed': '😫',
+                                'angry': '😠'
+                            };
+
+                            const entryHTML = `
+                                <div class="journal-entry">
+                                    <div class="entry-date">
+                                        ${moodIcons[entry.mood] || '📝'} ${date.toLocaleString('ru-RU')}
+                                    </div>
+                                    <div class="entry-content">
+                                        ${entry.text.replace(/\\n/g, '<br>')}
+                                    </div>
+                                </div>
+                            `;
+                            container.insertAdjacentHTML('afterbegin', entryHTML);
+                        });
+                    } else {
+                        container.innerHTML = '<p style="text-align: center; color: #666;">Записей пока нет</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки записей:', error);
+                });
+        }
+
+        // Загружаем записи при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadJournalEntries);
+    </script>
+</body>
+
+</html>

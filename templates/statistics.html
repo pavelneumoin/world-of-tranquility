@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статистика</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="page-statistics">
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-spa"></i>
+                <span>Мир спокойствия</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/breathing">Дыхание</a></li>
+                <li><a href="/techniques">Техники</a></li>
+                <li><a href="/statistics">Статистика</a></li>
+                <li><a href="/questionnaire">Анкета</a></li>
+                <li><a href="/journal">Журнал</a></li>
+                <li><a href="/media">Медиа</a></li>
+                <li><a href="/emergency">Помощь</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title"><i class="fas fa-chart-bar"></i> Статистика</h1>
+
+        <div class="stats-grid" id="stats-grid">
+            <!-- Статистика будет загружена динамически -->
+        </div>
+
+        <div class="data-section">
+            <h2><i class="fas fa-database"></i> Данные сервера</h2>
+            <div id="server-data" style="text-align: center; padding: 1rem;">
+                Загрузка данных...
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        function loadStatistics() {
+            fetch('/api/stats/summary')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        updateStatsGrid(data);
+                        updateServerData(data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки статистики:', error);
+                });
+        }
+
+        function updateStatsGrid(data) {
+            const grid = document.getElementById('stats-grid');
+            const stats = data.stats;
+
+            const statCards = `
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-file-signature"></i></div>
+                    <div class="stat-value">${stats.totalQuestionnaires || 0}</div>
+                    <div class="stat-label">Заполненных анкет</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-book"></i></div>
+                    <div class="stat-value">${stats.totalJournalEntries || 0}</div>
+                    <div class="stat-label">Записей в журнале</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-heartbeat"></i></div>
+                    <div class="stat-value">${stats.avgStressReduction || 0}%</div>
+                    <div class="stat-label">Снижение стресса</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-history"></i></div>
+                    <div class="stat-value">${stats.totalStressLogs || 0}</div>
+                    <div class="stat-label">Измерений стресса</div>
+                </div>
+            `;
+
+            grid.innerHTML = statCards;
+        }
+
+        function updateServerData(data) {
+            const container = document.getElementById('server-data');
+            const stats = data.stats;
+
+            const html = `
+                <p><strong>Всего данных:</strong> ${stats.totalQuestionnaires + stats.totalJournalEntries + stats.totalStressLogs}</p>
+                <p><strong>Среднее снижение стресса:</strong> ${stats.avgStressReduction || 0}%</p>
+                <p><strong>Последнее обновление:</strong> ${new Date().toLocaleString('ru-RU')}</p>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        document.addEventListener('DOMContentLoaded', loadStatistics);
+    </script>
+</body>
+
+</html>

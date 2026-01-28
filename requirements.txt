@@ -1,0 +1,2 @@
+# Python version
+# No external dependencies required - using only standard library

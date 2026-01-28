@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Медиа</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="page-media">
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-spa"></i>
+                <span>Мир спокойствия</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/breathing">Дыхание</a></li>
+                <li><a href="/techniques">Техники</a></li>
+                <li><a href="/statistics">Статистика</a></li>
+                <li><a href="/questionnaire">Анкета</a></li>
+                <li><a href="/journal">Журнал</a></li>
+                <li><a href="/media">Медиа</a></li>
+                <li><a href="/emergency">Помощь</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title"><i class="fas fa-photo-video"></i> Медиа для релаксации</h1>
+
+        <div class="meditation-timer">
+            <h2><i class="fas fa-clock"></i> Таймер медитации</h2>
+            <div class="timer-display" id="timer">05:00</div>
+            <div class="timer-controls">
+                <button class="timer-btn" onclick="startTimer()">▶️ Старт</button>
+                <button class="timer-btn" onclick="pauseTimer()">⏸️ Пауза</button>
+                <button class="timer-btn" onclick="resetTimer()">🔄 Сброс</button>
+            </div>
+            <div style="margin-top: 1rem;">
+                <button class="timer-btn" onclick="setTimer(300)">5 мин</button>
+                <button class="timer-btn" onclick="setTimer(600)">10 мин</button>
+                <button class="timer-btn" onclick="setTimer(900)">15 мин</button>
+            </div>
+        </div>
+
+        <div class="media-section">
+            <h2><i class="fas fa-music"></i> Аудио для медитации</h2>
+
+            <div class="audio-grid">
+                <div class="audio-card">
+                    <div class="audio-title">Дзен-медитация</div>
+                    <div class="audio-description">Звуки поющих чаш и ветра</div>
+                    <audio controls style="width: 100%; margin-top: 0.5rem;">
+                        <source src="https://assets.mixkit.co/music/preview/mixkit-zen-meditation-2216.mp3"
+                            type="audio/mpeg">
+                        Ваш браузер не поддерживает аудио элемент.
+                    </audio>
+                </div>
+
+                <div class="audio-card">
+                    <div class="audio-title">Дождь в лесу</div>
+                    <div class="audio-description">Успокаивающий звук дождя</div>
+                    <audio controls style="width: 100%; margin-top: 0.5rem;">
+                        <source src="https://assets.mixkit.co/music/preview/mixkit-rain-forest-1195.mp3"
+                            type="audio/mpeg">
+                        Ваш браузер не поддерживает аудио элемент.
+                    </audio>
+                </div>
+
+                <div class="audio-card">
+                    <div class="audio-title">Морские волны</div>
+                    <div class="audio-description">Звук прибоя и чаек</div>
+                    <audio controls style="width: 100%; margin-top: 0.5rem;">
+                        <source src="https://assets.mixkit.co/music/preview/mixkit-sea-waves-1185.mp3"
+                            type="audio/mpeg">
+                        Ваш браузер не поддерживает аудио элемент.
+                    </audio>
+                </div>
+
+                <div class="audio-card">
+                    <div class="audio-title">Тропический лес</div>
+                    <div class="audio-description">Звуки тропического леса с птицами</div>
+                    <audio controls style="width: 100%; margin-top: 0.5rem;">
+                        <source src="https://assets.mixkit.co/music/preview/mixkit-tropical-forest-1194.mp3"
+                            type="audio/mpeg">
+                        Ваш браузер не поддерживает аудио элемент.
+                    </audio>
+                </div>
+
+                <div class="audio-card">
+                    <div class="audio-title">Костер</div>
+                    <div class="audio-description">Треск костра для расслабления</div>
+                    <audio controls style="width: 100%; margin-top: 0.5rem;">
+                        <source src="https://assets.mixkit.co/music/preview/mixkit-campfire-crackles-1330.mp3"
+                            type="audio/mpeg">
+                        Ваш браузер не поддерживает аудио элемент.
+                    </audio>
+                </div>
+
+                <div class="audio-card">
+                    <div class="audio-title">Ручей в горах</div>
+                    <div class="audio-description">Звук горного ручья</div>
+                    <audio controls style="width: 100%; margin-top: 0.5rem;">
+                        <source src="https://assets.mixkit.co/music/preview/mixkit-mountain-stream-1191.mp3"
+                            type="audio/mpeg">
+                        Ваш браузер не поддерживает аудио элемент.
+                    </audio>
+                </div>
+
+                <div class="audio-card">
+                    <div class="audio-title">Белый шум</div>
+                    <div class="audio-description">Белый шум для концентрации</div>
+                    <audio controls style="width: 100%; margin-top: 0.5rem;">
+                        <source src="https://assets.mixkit.co/music/preview/mixkit-white-noise-246.mp3"
+                            type="audio/mpeg">
+                        Ваш браузер не поддерживает аудио элемент.
+                    </audio>
+                </div>
+
+                <div class="audio-card">
+                    <div class="audio-title">Медитативная музыка</div>
+                    <div class="audio-description">Мягкая медитативная музыка</div>
+                    <audio controls style="width: 100%; margin-top: 0.5rem;">
+                        <source src="https://assets.mixkit.co/music/preview/mixkit-meditative-2218.mp3"
+                            type="audio/mpeg">
+                        Ваш браузер не поддерживает аудио элемент.
+                    </audio>
+                </div>
+            </div>
+        </div>
+
+        <div class="media-section">
+            <h2><i class="fas fa-water"></i> Видео природы</h2>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/2OEL4P1Rz04?rel=0&controls=1&showinfo=0" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <p style="text-align: center; color: #666; margin-top: 1rem;">
+                Видео с успокаивающими звуками природы для медитации и релаксации
+            </p>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        let timerInterval;
+        let timerSeconds = 300;
+        let isTimerRunning = false;
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timerSeconds / 60);
+            const seconds = timerSeconds % 60;
+            document.getElementById('timer').textContent =
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            if (isTimerRunning) return;
+            isTimerRunning = true;
+
+            timerInterval = setInterval(() => {
+                if (timerSeconds > 0) {
+                    timerSeconds--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    isTimerRunning = false;
+                    alert('⏰ Время медитации истекло! Сделайте глубокий вдох и медленный выдох.');
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            timerSeconds = 300;
+            updateTimerDisplay();
+        }
+
+        function setTimer(seconds) {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            timerSeconds = seconds;
+            updateTimerDisplay();
+        }
+
+        updateTimerDisplay();
+    </script>
+</body>
+
+</html>

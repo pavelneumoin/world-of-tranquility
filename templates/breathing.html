@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дыхательные практики</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="page-breathing">
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-spa"></i>
+                <span>Мир спокойствия</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/breathing">Дыхание</a></li>
+                <li><a href="/techniques">Техники</a></li>
+                <li><a href="/statistics">Статистика</a></li>
+                <li><a href="/questionnaire">Анкета</a></li>
+                <li><a href="/journal">Журнал</a></li>
+                <li><a href="/media">Медиа</a></li>
+                <li><a href="/emergency">Помощь</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title"><i class="fas fa-lungs"></i> Дыхательные практики</h1>
+
+        <div class="technique-card">
+            <h2>Техника 4-7-8</h2>
+            <p>Эта техника помогает быстро успокоиться и снизить тревожность.</p>
+
+            <div class="breathing-animation" id="breathing-circle">
+                Дышите
+            </div>
+
+            <h3>Шаги:</h3>
+            <ol class="steps">
+                <li>Сядьте в удобное положение, выпрямите спину</li>
+                <li>Медленно вдохните через нос на 4 счета</li>
+                <li>Задержите дыхание на 7 счетов</li>
+                <li>Медленно выдохните через рот на 8 счетов</li>
+                <li>Повторите 4-5 раз</li>
+            </ol>
+
+            <button class="btn-start" onclick="startBreathing()">
+                <i class="fas fa-play"></i> Начать упражнение
+            </button>
+        </div>
+
+        <div class="technique-card">
+            <h2>Квадратное дыхание</h2>
+            <p>Техника для концентрации и снятия напряжения.</p>
+
+            <h3>Шаги:</h3>
+            <ol class="steps">
+                <li>Вдохните через нос на 4 счета</li>
+                <li>Задержите дыхание на 4 счета</li>
+                <li>Выдохните через нос на 4 счета</li>
+                <li>Задержите дыхание на 4 счета</li>
+                <li>Повторите 5-10 раз</li>
+            </ol>
+        </div>
+
+        <div class="technique-card">
+            <h2>Диафрагмальное дыхание</h2>
+            <p>Дыхание животом для глубокого расслабления.</p>
+
+            <h3>Шаги:</h3>
+            <ol class="steps">
+                <li>Лягте на спину или сядьте удобно</li>
+                <li>Положите одну руку на грудь, другую на живот</li>
+                <li>Медленно вдохните через нос, наполняя живот воздухом</li>
+                <li>Рука на животе должна подниматься, на груди - оставаться неподвижной</li>
+                <li>Медленно выдохните через слегка сжатые губы</li>
+                <li>Повторите 5-10 раз</li>
+            </ol>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        let isBreathing = false;
+        let breathingInterval;
+
+        function startBreathing() {
+            if (isBreathing) {
+                clearInterval(breathingInterval);
+                document.querySelector('.btn-start').innerHTML = '<i class="fas fa-play"></i> Начать упражнение';
+                document.getElementById('breathing-circle').textContent = 'Дышите';
+                isBreathing = false;
+            } else {
+                document.querySelector('.btn-start').innerHTML = '<i class="fas fa-stop"></i> Остановить';
+
+                let step = 0;
+                const steps = ['Вдох', 'Задержка', 'Выдох', 'Пауза'];
+
+                breathingInterval = setInterval(() => {
+                    const circle = document.getElementById('breathing-circle');
+                    circle.textContent = steps[step];
+                    circle.style.animation = 'none';
+                    setTimeout(() => {
+                        circle.style.animation = 'breathe 8s infinite ease-in-out';
+                    }, 10);
+
+                    step = (step + 1) % steps.length;
+                }, 4000);
+
+                isBreathing = true;
+
+                fetch('/api/start-breathing', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ technique: '4-7-8', startTime: new Date().toISOString() })
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>

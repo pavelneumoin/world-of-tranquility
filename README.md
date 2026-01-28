@@ -5,10 +5,11 @@
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Status](https://img.shields.io/badge/Status-Active-success.svg)
+[![Website](https://img.shields.io/badge/🌐_Сайт-world--of--tranquility-blueviolet)](https://world-of-tranquility.onrender.com)
 
 **Веб-приложение для управления стрессом и тревожностью**
 
-[Демо](https://world-of-tranquility.onrender.com) • [Документация](#-о-проекте) • [Установка](#-установка)
+[🌐 Открыть сайт](https://world-of-tranquility.onrender.com) • [Документация](#-о-проекте) • [Установка](#-установка)
 
 </div>
 

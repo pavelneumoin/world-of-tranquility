@@ -211,27 +211,27 @@ class SimpleHTTPServer:
     def html_response(self, html):
         body = html.encode('utf-8')
         headers = ["HTTP/1.1 200 OK", "Content-Type: text/html; charset=utf-8", f"Content-Length: {len(body)}", "Connection: close", "", ""]
-        return "\\r\\n".join(headers).encode('utf-8') + body
+        return "\r\n".join(headers).encode('utf-8') + body
 
     def json_response(self, data):
         json_data = json.dumps(data, ensure_ascii=False, indent=2)
         body = json_data.encode('utf-8')
         headers = ["HTTP/1.1 200 OK", "Content-Type: application/json; charset=utf-8", "Access-Control-Allow-Origin: *", f"Content-Length: {len(body)}", "Connection: close", "", ""]
-        return "\\r\\n".join(headers).encode('utf-8') + body
+        return "\r\n".join(headers).encode('utf-8') + body
 
     def static_response(self, content, content_type):
         body = content.encode('utf-8')
         headers = ["HTTP/1.1 200 OK", f"Content-Type: {content_type}; charset=utf-8", f"Content-Length: {len(body)}", "Connection: close", "", ""]
-        return "\\r\\n".join(headers).encode('utf-8') + body
+        return "\r\n".join(headers).encode('utf-8') + body
 
     def favicon_response(self):
-        return "\\r\\n".join(["HTTP/1.1 204 No Content", "Connection: close", "", ""]).encode('utf-8')
+        return "\r\n".join(["HTTP/1.1 204 No Content", "Connection: close", "", ""]).encode('utf-8')
 
     def error_response(self, code, message):
         html = f"<html><body><h1>Ошибка {code}</h1><p>{message}</p></body></html>"
         body = html.encode('utf-8')
         headers = [f"HTTP/1.1 {code} Error", "Content-Type: text/html; charset=utf-8", f"Content-Length: {len(body)}", "Connection: close", "", ""]
-        return "\\r\\n".join(headers).encode('utf-8') + body
+        return "\r\n".join(headers).encode('utf-8') + body
 
     def parse_body(self, request_data):
         lines = request_data.split('\\n')

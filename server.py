@@ -133,6 +133,12 @@ class SimpleHTTPServer:
         parsed_path = urlparse(path)
         path = parsed_path.path
 
+        # Strip /tranquility prefix for Nginx proxy
+        if path.startswith('/tranquility'):
+            path = path[len('/tranquility'):]
+            if path == '':
+                path = '/'
+
         # API endpoints
         if method == 'GET':
             if path == '/api/stats':

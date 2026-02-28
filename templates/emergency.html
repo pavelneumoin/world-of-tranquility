@@ -4,199 +4,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Экстренная помощь</title>
+    <title>Мир спокойствия - Экстренная помощь</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/tranquility/static/css/style.css">
+    <style>
+        .emergency-banner {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+        }
+
+        .emergency-banner .fas {
+            font-size: 4rem;
+            color: #ef4444;
+            margin-bottom: 20px;
+        }
+
+        .emergency-banner h1 {
+            color: #f87171;
+            margin-bottom: 15px;
+        }
+
+        .contact-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            display: inline-block;
+            text-align: left;
+        }
+
+        .contact-item {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .contact-item i {
+            color: #60a5fa;
+            width: 30px;
+        }
+    </style>
 </head>
 
 <body class="page-emergency">
     <nav>
         <div class="nav-container">
-            <a href="/" class="logo">
+            <a href="/tranquility/" class="logo">
                 <i class="fas fa-spa"></i>
                 <span>Мир спокойствия</span>
             </a>
             <ul class="nav-links">
-                <li><a href="/">Главная</a></li>
-                <li><a href="/breathing">Дыхание</a></li>
-                <li><a href="/techniques">Техники</a></li>
-                <li><a href="/statistics">Статистика</a></li>
-                <li><a href="/questionnaire">Анкета</a></li>
-                <li><a href="/journal">Журнал</a></li>
-                <li><a href="/media">Медиа</a></li>
-                <li><a href="/emergency">Помощь</a></li>
+                <li><a href="/tranquility/">Главная</a></li>
+                <li><a href="/tranquility/breathing">Дыхание</a></li>
+                <li><a href="/tranquility/techniques">Техники</a></li>
+                <li><a href="/tranquility/statistics">Статистика</a></li>
+                <li><a href="/tranquility/questionnaire">Анкета</a></li>
+                <li><a href="/tranquility/journal">Журнал</a></li>
+                <li><a href="/tranquility/media">Медиа</a></li>
+                <li><a href="/tranquility/emergency" style="color: #ef4444;">Помощь</a></li>
             </ul>
         </div>
     </nav>
 
     <div class="container">
-        <h1 class="page-title"><i class="fas fa-first-aid"></i> Экстренная помощь при стрессе</h1>
+        <div class="emergency-banner">
+            <i class="fas fa-heartbeat"></i>
+            <h1>Ты не один. Дыши.</h1>
+            <p style="font-size: 1.2rem; max-width: 600px; margin: 0 auto 30px; color: #fff;">Если вы чувствуете сильную
+                панику или вы не справляетесь, обратитесь за бесплатной и анонимной помощью.</p>
 
-        <div class="hotline">
-            <h3><i class="fas fa-phone"></i> Телефоны доверия (Россия):</h3>
-            <div class="hotline-number">8-800-2000-122</div>
-            <p>Единый общероссийский телефон доверия для детей, подростков и их родителей</p>
-            <div class="hotline-number">8-800-333-44-34</div>
-            <p>Кризисная линия доверия (круглосуточно, бесплатно)</p>
-        </div>
+            <a href="/tranquility/breathing" class="btn btn-hero"
+                style="background: linear-gradient(135deg, #ef4444, #f87171); box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4); margin-bottom: 30px;"><i
+                    class="fas fa-wind"></i> Перейти к Дыханию 4-7-8</a>
 
-        <div class="emergency-card">
-            <h2>Если прямо сейчас тяжело:</h2>
+            <br>
 
-            <div class="breathing-guide">
-                <h3>ДЫШИТЕ СО МНОЙ</h3>
-                <div class="count" id="breath-count">4</div>
-                <p id="breath-instruction">Вдох</p>
-                <button class="btn-calm" onclick="startCalmBreathing()">
-                    <i class="fas fa-play"></i> Начать успокаивающее дыхание
-                </button>
+            <div class="contact-box">
+                <h3 style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                    Телефоны доверия:</h3>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i> <strong>Единый телефон доверия:</strong> 8-800-333-44-34
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-child"></i> <strong>Телефон доверия для детей и подростков:</strong> 8-800-2000-122
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-ambulance"></i> <strong>Скорая помощь:</strong> 103 или 112
+                </div>
             </div>
-
-            <div class="grounding-card">
-                <h4>Техника заземления 5-4-3-2-1 (сделайте прямо сейчас):</h4>
-                <ol>
-                    <li>Назовите <strong>5</strong> вещей, которые видите вокруг</li>
-                    <li>Почувствуйте <strong>4</strong> тактильных ощущения (одежда, пол, воздух)</li>
-                    <li>Услышьте <strong>3</strong> звука в комнате</li>
-                    <li>Обнаружьте <strong>2</strong> запаха</li>
-                    <li>Почувствуйте <strong>1</strong> вкус во рту</li>
-                </ol>
-            </div>
-
-            <div class="grounding-card">
-                <h4>Физическое заземление:</h4>
-                <ul>
-                    <li>Опустите руки в холодную воду</li>
-                    <li>Сожмите и разожмите кулаки 10 раз</li>
-                    <li>Попрыгайте на месте 30 секунд</li>
-                    <li>Обнимите себя крепко</li>
-                    <li>Потянитесь как кошка</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="emergency-card">
-            <h2>Что делать при панической атаке:</h2>
-
-            <ol>
-                <li><strong>Напомните себе:</strong> "Это паническая атака, она пройдет"</li>
-                <li><strong>Сосредоточьтесь на дыхании:</strong> вдох на 4, задержка на 4, выдох на 6</li>
-                <li><strong>Заземлитесь:</strong> найдите опору для рук или ног</li>
-                <li><strong>Используйте холод:</strong> приложите что-то холодное к запястьям или лицу</li>
-                <li><strong>Не сопротивляйтесь:</strong> позвольте чувствам быть, они пройдут</li>
-                <li><strong>После приступа:</strong> выпейте воды, отдохните, похвалите себя</li>
-            </ol>
-        </div>
-
-        <div class="emergency-card">
-            <h2>Экстренный план самопомощи:</h2>
-
-            <h4>Шаг 1: Физическое успокоение (выберите одно):</h4>
-            <ul>
-                <li>Дыхание 4-7-8</li>
-                <li>Прогулка быстрым шагом 10 минут</li>
-                <li>Контрастный душ</li>
-                <li>Массаж рук или стоп</li>
-            </ul>
-
-            <h4>Шаг 2: Эмоциональная разрядка (выберите одно):</h4>
-            <ul>
-                <li>Напишите все, что чувствуете, на бумаге</li>
-                <li>Поплачьте, если хочется</li>
-                <li>Поговорите с кем-то, кому доверяете</li>
-                <li>Послушайте успокаивающую музыку</li>
-            </ul>
-
-            <h4>Шаг 3: Отвлечение внимания (выберите одно):</h4>
-            <ul>
-                <li>Сосчитайте предметы определенного цвета в комнате</li>
-                <li>Назовите все, что видите, начиная с буквы А</li>
-                <li>Решите простую математическую задачу</li>
-                <li>Вспомните слова песни или стихотворения</li>
-            </ul>
-        </div>
-
-        <div class="emergency-card">
-            <h2>Когда обращаться за профессиональной помощью:</h2>
-
-            <ul>
-                <li>Панические атаки случаются чаще 2 раз в неделю</li>
-                <li>Тревога мешает работать, учиться, общаться</li>
-                <li>Появились мысли о самоповреждении</li>
-                <li>Нарушен сон более 2 недель</li>
-                <li>Потеря аппетита или переедание</li>
-                <li>Чувство безнадежности длится более 2 недель</li>
-            </ul>
-
-            <p style="margin-top: 1rem; font-style: italic;">
-                <strong>Важно:</strong> Обращение за помощью - признак силы, а не слабости.
-                Психологи и психотерапевты обучены помогать в таких ситуациях.
-            </p>
         </div>
     </div>
 
-    <script src="/static/js/main.js"></script>
-    <script>
-        let isCalmBreathing = false;
-        let calmInterval;
-        let breathPhase = 'inhale';
-        let count = 4;
-
-        function startCalmBreathing() {
-            if (isCalmBreathing) {
-                clearInterval(calmInterval);
-                document.querySelector('.btn-calm').innerHTML = '<i class="fas fa-play"></i> Начать успокаивающее дыхание';
-                document.getElementById('breath-count').textContent = '4';
-                document.getElementById('breath-instruction').textContent = 'Вдох';
-                isCalmBreathing = false;
-            } else {
-                document.querySelector('.btn-calm').innerHTML = '<i class="fas fa-stop"></i> Остановить';
-
-                count = 4;
-                breathPhase = 'inhale';
-
-                calmInterval = setInterval(() => {
-                    const countElement = document.getElementById('breath-count');
-                    const instructionElement = document.getElementById('breath-instruction');
-
-                    countElement.textContent = count;
-
-                    if (breathPhase === 'inhale') {
-                        instructionElement.textContent = 'Вдох';
-                        if (count === 1) {
-                            breathPhase = 'hold';
-                            count = 4;
-                        } else {
-                            count--;
-                        }
-                    } else if (breathPhase === 'hold') {
-                        instructionElement.textContent = 'Задержка';
-                        if (count === 1) {
-                            breathPhase = 'exhale';
-                            count = 6;
-                        } else {
-                            count--;
-                        }
-                    } else if (breathPhase === 'exhale') {
-                        instructionElement.textContent = 'Выдох';
-                        if (count === 1) {
-                            breathPhase = 'inhale';
-                            count = 4;
-                        } else {
-                            count--;
-                        }
-                    }
-                }, 1000);
-
-                isCalmBreathing = true;
-            }
-        }
-
-        // Автоматически запускаем успокаивающее дыхание при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function () {
-            setTimeout(startCalmBreathing, 2000);
-        });
-    </script>
+    <script src="/tranquility/static/js/main.js"></script>
 </body>
 
 </html>

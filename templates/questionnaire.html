@@ -4,172 +4,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Анкетирование</title>
+    <title>Мир спокойствия - Анкета</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/tranquility/static/css/style.css">
 </head>
 
 <body class="page-questionnaire">
     <nav>
         <div class="nav-container">
-            <a href="/" class="logo">
+            <a href="/tranquility/" class="logo">
                 <i class="fas fa-spa"></i>
                 <span>Мир спокойствия</span>
             </a>
             <ul class="nav-links">
-                <li><a href="/">Главная</a></li>
-                <li><a href="/breathing">Дыхание</a></li>
-                <li><a href="/techniques">Техники</a></li>
-                <li><a href="/statistics">Статистика</a></li>
-                <li><a href="/questionnaire">Анкета</a></li>
-                <li><a href="/journal">Журнал</a></li>
-                <li><a href="/media">Медиа</a></li>
-                <li><a href="/emergency">Помощь</a></li>
+                <li><a href="/tranquility/">Главная</a></li>
+                <li><a href="/tranquility/breathing">Дыхание</a></li>
+                <li><a href="/tranquility/techniques">Техники</a></li>
+                <li><a href="/tranquility/statistics">Статистика</a></li>
+                <li><a href="/tranquility/questionnaire" style="color: var(--secondary-color);">Анкета</a></li>
+                <li><a href="/tranquility/journal">Журнал</a></li>
+                <li><a href="/tranquility/media">Медиа</a></li>
+                <li><a href="/tranquility/emergency">Помощь</a></li>
             </ul>
         </div>
     </nav>
 
-    <div class="container">
-        <h1 class="page-title"><i class="fas fa-clipboard-check"></i> Анкетирование</h1>
+    <div class="container" style="max-width: 800px; margin-top: 3rem; margin-bottom: 3rem;">
+        <div class="stress-tracker" style="text-align: left;">
+            <h2 style="margin-bottom: 20px;"><i class="fas fa-clipboard-list"></i> Рефлексия до и после</h2>
+            <p style="margin-bottom: 30px;">Сравните свои ощущения до начала практики и после её завершения.</p>
 
-        <div class="questionnaire-section">
-            <h2>Оцените ваше состояние ДО практики</h2>
+            <form id="qForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <!-- До практики -->
+                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;">
+                        <h3 style="margin-bottom: 15px; color: #a371f7;">ДО практики</h3>
+                        <div class="form-group">
+                            <label>Уровень напряжения (1-10):</label>
+                            <input type="number" id="stress-before" class="form-control" min="1" max="10" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Физические ощущения:</label>
+                            <input type="text" id="body-before" class="form-control"
+                                placeholder="Комок в горле, напряжение в плечах..." required>
+                        </div>
+                    </div>
 
-            <div class="scale-item">
-                <label>Уровень тревожности:</label>
-                <input type="range" id="anxiety-before" min="0" max="10" value="5">
-                <div class="scale-labels">
-                    <span>Спокойствие</span>
-                    <span>Умеренно</span>
-                    <span>Сильная тревога</span>
+                    <!-- После практики -->
+                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;">
+                        <h3 style="margin-bottom: 15px; color: #56d364;">ПОСЛЕ практики</h3>
+                        <div class="form-group">
+                            <label>Уровень напряжения (1-10):</label>
+                            <input type="number" id="stress-after" class="form-control" min="1" max="10" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Физические ощущения:</label>
+                            <input type="text" id="body-after" class="form-control"
+                                placeholder="Расслабленность, тепло..." required>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="scale-item">
-                <label>Уровень стресса:</label>
-                <input type="range" id="stress-before" min="0" max="10" value="5">
-                <div class="scale-labels">
-                    <span>Расслаблен</span>
-                    <span>Средне</span>
-                    <span>Сильный стресс</span>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Какую технику вы использовали?</label>
+                    <select id="technique" class="form-control" required
+                        style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
+                        <option value="Дыхание 4-7-8" style="color: #000;">Дыхание 4-7-8</option>
+                        <option value="Квадратное дыхание" style="color: #000;">Квадратное дыхание</option>
+                        <option value="Медитация" style="color: #000;">Медитация звуков</option>
+                        <option value="Заземление" style="color: #000;">Заземление 5-4-3-2-1</option>
+                    </select>
                 </div>
-            </div>
 
-            <div class="scale-item">
-                <label>Настроение:</label>
-                <input type="range" id="mood-before" min="0" max="10" value="5">
-                <div class="scale-labels">
-                    <span>Плохое</span>
-                    <span>Нормальное</span>
-                    <span>Отличное</span>
-                </div>
-            </div>
-
-            <label>Что вы чувствуете в данный момент?</label>
-            <textarea id="feelings-before" placeholder="Опишите ваши ощущения..."></textarea>
-        </div>
-
-        <div class="questionnaire-section">
-            <h2>Оцените ваше состояние ПОСЛЕ практики</h2>
-
-            <div class="scale-item">
-                <label>Уровень тревожности:</label>
-                <input type="range" id="anxiety-after" min="0" max="10" value="5">
-                <div class="scale-labels">
-                    <span>Спокойствие</span>
-                    <span>Умеренно</span>
-                    <span>Сильная тревога</span>
-                </div>
-            </div>
-
-            <div class="scale-item">
-                <label>Уровень стресса:</label>
-                <input type="range" id="stress-after" min="0" max="10" value="5">
-                <div class="scale-labels">
-                    <span>Расслаблен</span>
-                    <span>Средне</span>
-                    <span>Сильный стресс</span>
-                </div>
-            </div>
-
-            <div class="scale-item">
-                <label>Настроение:</label>
-                <input type="range" id="mood-after" min="0" max="10" value="5">
-                <div class="scale-labels">
-                    <span>Плохое</span>
-                    <span>Нормальное</span>
-                    <span>Отличное</span>
-                </div>
-            </div>
-
-            <label>Как изменились ваши ощущения?</label>
-            <textarea id="feelings-after" placeholder="Опишите изменения..."></textarea>
-
-            <label>Какая техника вам помогла больше всего?</label>
-            <select id="technique">
-                <option value="breathing-4-7-8">Дыхание 4-7-8</option>
-                <option value="breathing-square">Квадратное дыхание</option>
-                <option value="muscle-relaxation">Мышечная релаксация</option>
-                <option value="grounding">Техника заземления</option>
-                <option value="meditation">Медитация</option>
-            </select>
-        </div>
-
-        <div id="message" class="message"></div>
-
-        <button class="btn-submit" onclick="submitQuestionnaire()">
-            <i class="fas fa-paper-plane"></i> Отправить анкету
-        </button>
-
-        <div style="text-align: center; margin-top: 2rem; color: #666;">
-            <p><small>Ваши ответы помогут нам улучшить сервис. Все данные анонимны.</small></p>
+                <button type="submit" class="btn btn-hero" style="width: 100%; margin-top: 20px;"><i
+                        class="fas fa-paper-plane"></i> Отправить анкету</button>
+            </form>
+            <div id="qResult"
+                style="margin-top: 20px; font-weight: bold; color: var(--secondary-color); display: none;">Анкета
+                успешно сохранена в базе.</div>
         </div>
     </div>
 
-    <script src="/static/js/main.js"></script>
+    <script src="/tranquility/static/js/main.js"></script>
     <script>
-        function submitQuestionnaire() {
-            const questionnaire = {
+        document.getElementById('qForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const data = {
                 before: {
-                    anxiety: document.getElementById('anxiety-before').value,
                     stress: document.getElementById('stress-before').value,
-                    mood: document.getElementById('mood-before').value,
-                    feelings: document.getElementById('feelings-before').value
+                    body: document.getElementById('body-before').value
                 },
                 after: {
-                    anxiety: document.getElementById('anxiety-after').value,
                     stress: document.getElementById('stress-after').value,
-                    mood: document.getElementById('mood-after').value,
-                    feelings: document.getElementById('feelings-after').value
+                    body: document.getElementById('body-after').value
                 },
-                technique: document.getElementById('technique').value,
-                timestamp: new Date().toISOString()
+                technique: document.getElementById('technique').value
             };
 
-            fetch('/api/submit-feedback', {
+            fetch('/tranquility/api/submit-feedback', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(questionnaire)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    const message = document.getElementById('message');
-                    message.textContent = data.message;
-                    message.className = 'message success';
-                    message.style.display = 'block';
-
-                    if (data.status === 'success') {
-                        document.querySelectorAll('input[type="range"]').forEach(input => input.value = 5);
-                        document.querySelectorAll('textarea').forEach(ta => ta.value = '');
-                    }
-                })
-                .catch(error => {
-                    const message = document.getElementById('message');
-                    message.textContent = 'Ошибка отправки анкеты';
-                    message.className = 'message error';
-                    message.style.display = 'block';
-                });
-        }
+                body: JSON.stringify(data)
+            }).then(() => {
+                document.getElementById('qResult').style.display = 'block';
+                this.reset();
+                setTimeout(() => { document.getElementById('qResult').style.display = 'none'; }, 3000);
+            });
+        });
     </script>
 </body>
 

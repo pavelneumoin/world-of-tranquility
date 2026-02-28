@@ -4,137 +4,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Техники релаксации</title>
+    <title>Мир спокойствия - Техники заземления</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/tranquility/static/css/style.css">
+    <style>
+        .technique-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .tech-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: left;
+            transition: var(--transition);
+        }
+
+        .tech-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.7);
+        }
+
+        .tech-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .steps {
+            list-style-position: inside;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-top: 15px;
+        }
+    </style>
 </head>
 
 <body class="page-techniques">
     <nav>
         <div class="nav-container">
-            <a href="/" class="logo">
+            <a href="/tranquility/" class="logo">
                 <i class="fas fa-spa"></i>
                 <span>Мир спокойствия</span>
             </a>
             <ul class="nav-links">
-                <li><a href="/">Главная</a></li>
-                <li><a href="/breathing">Дыхание</a></li>
-                <li><a href="/techniques">Техники</a></li>
-                <li><a href="/statistics">Статистика</a></li>
-                <li><a href="/questionnaire">Анкета</a></li>
-                <li><a href="/journal">Журнал</a></li>
-                <li><a href="/media">Медиа</a></li>
-                <li><a href="/emergency">Помощь</a></li>
+                <li><a href="/tranquility/">Главная</a></li>
+                <li><a href="/tranquility/breathing">Дыхание</a></li>
+                <li><a href="/tranquility/techniques" style="color: var(--secondary-color);">Техники</a></li>
+                <li><a href="/tranquility/statistics">Статистика</a></li>
+                <li><a href="/tranquility/questionnaire">Анкета</a></li>
+                <li><a href="/tranquility/journal">Журнал</a></li>
+                <li><a href="/tranquility/media">Медиа</a></li>
+                <li><a href="/tranquility/emergency">Помощь</a></li>
             </ul>
         </div>
     </nav>
 
     <div class="container">
-        <h1 class="page-title"><i class="fas fa-brain"></i> Техники релаксации</h1>
+        <h1 style="text-align: center; margin-top: 2rem;"><i class="fas fa-brain"></i> Техники заземления и медитации
+        </h1>
+        <p style="text-align: center; color: var(--text-muted); max-width: 600px; margin: 10px auto;">Практики для
+            возвращения в настоящий момент и снижения тревожности.</p>
 
-        <div class="technique-card">
-            <h2>Прогрессивная мышечная релаксация</h2>
-            <p>Техника поочередного напряжения и расслабления мышц для снятия физического напряжения.</p>
-
-            <div class="benefits">
-                <h4>Преимущества:</h4>
-                <ul>
-                    <li>Снижение мышечного напряжения</li>
-                    <li>Улучшение сна</li>
-                    <li>Снижение тревожности</li>
-                    <li>Повышение осознанности тела</li>
-                </ul>
+        <div class="technique-grid">
+            <div class="tech-card">
+                <i class="fas fa-hand-sparkles tech-icon"></i>
+                <h3 style="margin-bottom: 10px;">Метод 5-4-3-2-1</h3>
+                <p>Мощная техника заземления при сильной тревоге.</p>
+                <ol class="steps">
+                    <li><b>5</b> вещей, которые вы видите</li>
+                    <li><b>4</b> вещи, которые можно потрогать</li>
+                    <li><b>3</b> вещи, которые вы слышите</li>
+                    <li><b>2</b> вещи, которые вы можете понюхать</li>
+                    <li><b>1</b> вещь, которую можно попробовать на вкус</li>
+                </ol>
             </div>
 
-            <h3>Шаги:</h3>
-            <ol class="steps">
-                <li>Сядьте или лягте в удобное положение</li>
-                <li>Начните с мышц лица - сильно зажмурьтесь на 5 секунд, затем расслабьте на 30 секунд</li>
-                <li>Напрягите мышцы шеи и плеч, подняв плечи к ушам на 5 секунд, затем расслабьте</li>
-                <li>Сожмите кулаки на 5 секунд, затем расслабьте руки</li>
-                <li>Напрягите мышцы живота на 5 секунд, затем расслабьте</li>
-                <li>Напрягите мышцы ног, вытянув носки на 5 секунд, затем расслабьте</li>
-                <li>Повторите весь цикл 2-3 раза</li>
-            </ol>
-        </div>
-
-        <div class="technique-card">
-            <h2>Техника заземления 5-4-3-2-1</h2>
-            <p>Метод для возвращения в настоящее при тревоге или панической атаке.</p>
-
-            <div class="benefits">
-                <h4>Преимущества:</h4>
-                <ul>
-                    <li>Быстрое снижение тревоги</li>
-                    <li>Возвращение в настоящее</li>
-                    <li>Улучшение концентрации</li>
-                    <li>Простота выполнения</li>
-                </ul>
+            <div class="tech-card">
+                <i class="fas fa-search-location tech-icon"></i>
+                <h3 style="margin-bottom: 10px;">Техника "Якорь"</h3>
+                <p>Помогает сфокусировать внимание на теле.</p>
+                <ol class="steps">
+                    <li>Сядьте ровно</li>
+                    <li>Плотно прижмите стопы к полу</li>
+                    <li>Сконцентрируйтесь на ощущении опоры</li>
+                    <li>Дышите медленно и глубоко</li>
+                </ol>
             </div>
 
-            <h3>Шаги:</h3>
-            <ol class="steps">
-                <li><strong>5 вещей, которые вы видите:</strong> найдите и назовите 5 предметов вокруг</li>
-                <li><strong>4 вещи, которые вы чувствуете:</strong> обратите внимание на 4 тактильных ощущения</li>
-                <li><strong>3 вещи, которые вы слышите:</strong> прислушайтесь к 3 звукам вокруг</li>
-                <li><strong>2 вещи, которые вы чувствуете на запах:</strong> найдите 2 запаха</li>
-                <li><strong>1 вещь, которую вы можете попробовать на вкус:</strong> обратите внимание на вкус во рту
-                </li>
-            </ol>
-        </div>
-
-        <div class="technique-card">
-            <h2>Визуализация безопасного места</h2>
-            <p>Техника мысленного создания успокаивающего образа для расслабления.</p>
-
-            <div class="benefits">
-                <h4>Преимущества:</h4>
-                <ul>
-                    <li>Снижение стресса</li>
-                    <li>Развитие воображения</li>
-                    <li>Создание внутреннего ресурса спокойствия</li>
-                    <li>Улучшение настроения</li>
-                </ul>
+            <div class="tech-card">
+                <i class="fas fa-headphones tech-icon"></i>
+                <h3 style="margin-bottom: 10px;">Медитация звуков</h3>
+                <p>Направьте внимание на окружающую среду.</p>
+                <ol class="steps">
+                    <li>Закройте глаза</li>
+                    <li>Прислушайтесь к самым близким звукам</li>
+                    <li>Переключитесь на самые далекие звуки</li>
+                    <li>Зайдите в раздел <a href="/tranquility/media" style="color: #60a5fa;">Медиа</a> для практики
+                    </li>
+                </ol>
             </div>
-
-            <h3>Шаги:</h3>
-            <ol class="steps">
-                <li>Закройте глаза и сделайте 3 глубоких вдоха</li>
-                <li>Представьте место, где вы чувствуете себя абсолютно безопасно и спокойно</li>
-                <li>Добавьте детали: какие цвета вы видите? Какие звуки слышите?</li>
-                <li>Какие запахи чувствуете? Какие тактильные ощущения?</li>
-                <li>Побудьте в этом месте 5-10 минут, наслаждаясь ощущением безопасности</li>
-                <li>Медленно вернитесь в настоящее, сделав глубокий вдох</li>
-            </ol>
-        </div>
-
-        <div class="technique-card">
-            <h2>Медитация осознанности</h2>
-            <p>Практика наблюдения за мыслями и чувствами без оценки.</p>
-
-            <div class="benefits">
-                <h4>Преимущества:</h4>
-                <ul>
-                    <li>Улучшение концентрации</li>
-                    <li>Снижение реактивности</li>
-                    <li>Повышение самосознания</li>
-                    <li>Снижение уровня кортизола</li>
-                </ul>
-            </div>
-
-            <h3>Шаги:</h3>
-            <ol class="steps">
-                <li>Сядьте удобно с прямой спиной</li>
-                <li>Закройте глаза и сосредоточьтесь на дыхании</li>
-                <li>Когда мысли приходят, просто отмечайте их и возвращайтесь к дыханию</li>
-                <li>Не пытайтесь остановить мысли, просто наблюдайте за ними</li>
-                <li>Начните с 5 минут в день, постепенно увеличивая время</li>
-                <li>Будьте добры к себе, если ум часто отвлекается</li>
-            </ol>
         </div>
     </div>
 
-    <script src="/static/js/main.js"></script>
+    <script src="/tranquility/static/js/main.js"></script>
 </body>
 
 </html>

@@ -4,122 +4,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Дыхательные практики</title>
+    <title>Мир спокойствия - Дыхание</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/tranquility/static/css/style.css">
+    <style>
+        .breathing-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            margin-top: 2rem;
+        }
+
+        .breath-circle-wrapper {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .breath-circle-outer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.2);
+            transition: all 4s ease-in-out, box-shadow 4s ease-in-out;
+        }
+
+        .breath-circle-inner {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+            transition: all 4s ease-in-out;
+            z-index: 2;
+        }
+
+        /* Анимации (управляются через JS классы) */
+        .breathing-inhale .breath-circle-inner {
+            transform: scale(2);
+            /* Расширяется до границ outer */
+            background: linear-gradient(135deg, #10b981, #34d399);
+        }
+
+        .breathing-inhale .breath-circle-outer {
+            box-shadow: 0 0 80px rgba(16, 185, 129, 0.6);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .breathing-hold .breath-circle-inner {
+            transform: scale(2);
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        }
+
+        .breathing-hold .breath-circle-outer {
+            box-shadow: 0 0 80px rgba(59, 130, 246, 0.7);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .breathing-exhale .breath-circle-inner {
+            transform: scale(1);
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        }
+
+        .breathing-exhale .breath-circle-outer {
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+
+        .breath-text {
+            position: absolute;
+            z-index: 3;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-stop {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-stop:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+    </style>
 </head>
 
-<body class="page-breathing">
+<body>
     <nav>
-        <div class="nav-container">
-            <a href="/" class="logo">
+        <div class="container nav-container">
+            <a href="/tranquility/" class="logo">
                 <i class="fas fa-spa"></i>
                 <span>Мир спокойствия</span>
             </a>
             <ul class="nav-links">
-                <li><a href="/">Главная</a></li>
-                <li><a href="/breathing">Дыхание</a></li>
-                <li><a href="/techniques">Техники</a></li>
-                <li><a href="/statistics">Статистика</a></li>
-                <li><a href="/questionnaire">Анкета</a></li>
-                <li><a href="/journal">Журнал</a></li>
-                <li><a href="/media">Медиа</a></li>
-                <li><a href="/emergency">Помощь</a></li>
+                <li><a href="/tranquility/">Главная</a></li>
+                <li><a href="/tranquility/breathing" style="color: var(--secondary-color);">Дыхание</a></li>
+                <li><a href="/tranquility/techniques">Техники</a></li>
+                <li><a href="/tranquility/statistics">Статистика</a></li>
+                <li><a href="/tranquility/questionnaire">Анкета</a></li>
+                <li><a href="/tranquility/journal">Журнал</a></li>
+                <li><a href="/tranquility/media">Медиа</a></li>
+                <li><a href="/tranquility/emergency">Помощь</a></li>
             </ul>
         </div>
     </nav>
 
-    <div class="container">
-        <h1 class="page-title"><i class="fas fa-lungs"></i> Дыхательные практики</h1>
+    <main class="container">
+        <div class="breathing-container">
+            <h1 style="margin-bottom: 10px;">Дыхание 4-7-8</h1>
+            <p style="color: var(--text-muted); margin-bottom: 40px; text-align: center; max-width: 600px;">
+                Глубокое диафрагмальное дыхание для мгновенного снятия стресса и переключения нервной системы в режим
+                отдыха.
+            </p>
 
-        <div class="technique-card">
-            <h2>Техника 4-7-8</h2>
-            <p>Эта техника помогает быстро успокоиться и снизить тревожность.</p>
-
-            <div class="breathing-animation" id="breathing-circle">
-                Дышите
+            <div class="breath-circle-wrapper" id="breathWrapper">
+                <div class="breath-circle-outer"></div>
+                <div class="breath-circle-inner" id="innerCircle"></div>
+                <div class="breath-text" id="breathText">Нажмите "Старт"</div>
             </div>
 
-            <h3>Шаги:</h3>
-            <ol class="steps">
-                <li>Сядьте в удобное положение, выпрямите спину</li>
-                <li>Медленно вдохните через нос на 4 счета</li>
-                <li>Задержите дыхание на 7 счетов</li>
-                <li>Медленно выдохните через рот на 8 счетов</li>
-                <li>Повторите 4-5 раз</li>
-            </ol>
-
-            <button class="btn-start" onclick="startBreathing()">
-                <i class="fas fa-play"></i> Начать упражнение
-            </button>
+            <div class="controls">
+                <button class="btn btn-hero" id="startBtn" onclick="startExercise()">
+                    <i class="fas fa-play"></i> Старт
+                </button>
+                <button class="btn btn-stop" id="stopBtn" onclick="stopExercise()" style="display: none;">
+                    <i class="fas fa-stop"></i> Стоп
+                </button>
+            </div>
         </div>
+    </main>
 
-        <div class="technique-card">
-            <h2>Квадратное дыхание</h2>
-            <p>Техника для концентрации и снятия напряжения.</p>
-
-            <h3>Шаги:</h3>
-            <ol class="steps">
-                <li>Вдохните через нос на 4 счета</li>
-                <li>Задержите дыхание на 4 счета</li>
-                <li>Выдохните через нос на 4 счета</li>
-                <li>Задержите дыхание на 4 счета</li>
-                <li>Повторите 5-10 раз</li>
-            </ol>
-        </div>
-
-        <div class="technique-card">
-            <h2>Диафрагмальное дыхание</h2>
-            <p>Дыхание животом для глубокого расслабления.</p>
-
-            <h3>Шаги:</h3>
-            <ol class="steps">
-                <li>Лягте на спину или сядьте удобно</li>
-                <li>Положите одну руку на грудь, другую на живот</li>
-                <li>Медленно вдохните через нос, наполняя живот воздухом</li>
-                <li>Рука на животе должна подниматься, на груди - оставаться неподвижной</li>
-                <li>Медленно выдохните через слегка сжатые губы</li>
-                <li>Повторите 5-10 раз</li>
-            </ol>
-        </div>
-    </div>
-
-    <script src="/static/js/main.js"></script>
+    <script src="/tranquility/static/js/main.js"></script>
     <script>
         let isBreathing = false;
-        let breathingInterval;
+        let timeoutIds = [];
+        let cycleId = null;
 
-        function startBreathing() {
-            if (isBreathing) {
-                clearInterval(breathingInterval);
-                document.querySelector('.btn-start').innerHTML = '<i class="fas fa-play"></i> Начать упражнение';
-                document.getElementById('breathing-circle').textContent = 'Дышите';
-                isBreathing = false;
-            } else {
-                document.querySelector('.btn-start').innerHTML = '<i class="fas fa-stop"></i> Остановить';
+        const wrapper = document.getElementById('breathWrapper');
+        const text = document.getElementById('breathText');
+        const innerCircle = document.getElementById('innerCircle');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
 
-                let step = 0;
-                const steps = ['Вдох', 'Задержка', 'Выдох', 'Пауза'];
+        function startExercise() {
+            if (isBreathing) return;
+            isBreathing = true;
 
-                breathingInterval = setInterval(() => {
-                    const circle = document.getElementById('breathing-circle');
-                    circle.textContent = steps[step];
-                    circle.style.animation = 'none';
-                    setTimeout(() => {
-                        circle.style.animation = 'breathe 8s infinite ease-in-out';
-                    }, 10);
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'inline-block';
 
-                    step = (step + 1) % steps.length;
-                }, 4000);
+            // Начать первый цикл
+            runCycle();
+            // Повторять цикл длительностью 19 секунд (4 + 7 + 8)
+            cycleId = setInterval(runCycle, 19000);
 
-                isBreathing = true;
+            // Log session start
+            fetch('/tranquility/api/start-breathing', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ technique: '4-7-8', startTime: new Date().toISOString() })
+            }).catch(e => console.log(e));
+        }
 
-                fetch('/api/start-breathing', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ technique: '4-7-8', startTime: new Date().toISOString() })
-                });
-            }
+        function stopExercise() {
+            isBreathing = false;
+            clearInterval(cycleId);
+            timeoutIds.forEach(clearTimeout);
+            timeoutIds = [];
+
+            // Reset styles
+            wrapper.className = 'breath-circle-wrapper';
+            innerCircle.style.transition = 'all 1s ease';
+            text.textContent = 'Остановлено';
+
+            startBtn.style.display = 'inline-block';
+            stopBtn.style.display = 'none';
+            startBtn.innerHTML = '<i class="fas fa-redo"></i> Начать заново';
+        }
+
+        function runCycle() {
+            // ВДОХ (4 сек)
+            wrapper.className = 'breath-circle-wrapper breathing-inhale';
+            innerCircle.style.transition = 'all 4s ease-in-out';
+            text.textContent = 'Глубокий вдох... (4)';
+
+            let t1 = setTimeout(() => {
+                if (!isBreathing) return;
+                // ЗАДЕРЖКА (7 сек)
+                wrapper.className = 'breath-circle-wrapper breathing-hold';
+                text.textContent = 'Задержка... (7)';
+            }, 4000);
+
+            let t2 = setTimeout(() => {
+                if (!isBreathing) return;
+                // ВЫДОХ (8 сек)
+                wrapper.className = 'breath-circle-wrapper breathing-exhale';
+                innerCircle.style.transition = 'all 8s ease-in-out';
+                text.textContent = 'Медленный выдох... (8)';
+            }, 11000); // 4 + 7
+
+            timeoutIds.push(t1, t2);
         }
     </script>
 </body>

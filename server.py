@@ -1,6 +1,6 @@
 """
 Мир спокойствия - HTTP сервер
-Реструктурированная версия с отдельными шаблонами и статическими файлами
+Реструктурированная версия с отдельными шаблонами, статическими файлами и SQLite БД (Glassmorphism Zen)
 """
 
 import socket
@@ -8,12 +8,12 @@ import threading
 import json
 import time
 import os
+import sqlite3
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 
-
 class SimpleHTTPServer:
-    """Простой HTTP сервер для сайта управления стрессом"""
+    """Простой HTTP сервер для сайта управления стрессом (SQLite)"""
 
     def __init__(self, host='localhost', port=5000):
         self.host = host
@@ -22,15 +22,51 @@ class SimpleHTTPServer:
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.running = False
         
-        # Хранилище данных
-        self.questionnaires = []
-        self.journal_entries = []
-        self.stress_logs = []
-        
         # Пути к файлам
         self.base_dir = os.path.dirname(os.path.abspath(__file__))
         self.templates_dir = os.path.join(self.base_dir, 'templates')
         self.static_dir = os.path.join(self.base_dir, 'static')
+        self.db_path = os.path.join(self.base_dir, 'data.db')
+        
+        self.init_db()
+
+    def get_db_connection(self):
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        return conn
+
+    def init_db(self):
+        """Инициализация SQLite базы данных"""
+        conn = self.get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS stress_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                level INTEGER NOT NULL,
+                timestamp TEXT NOT NULL
+            )
+        ''')
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS journal_entries (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                text TEXT NOT NULL,
+                mood TEXT NOT NULL,
+                timestamp TEXT NOT NULL
+            )
+        ''')
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS questionnaires (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                data_json TEXT NOT NULL,
+                timestamp TEXT NOT NULL
+            )
+        ''')
+        
+        conn.commit()
+        conn.close()
 
     def start(self):
         """Запуск сервера"""
@@ -40,9 +76,7 @@ class SimpleHTTPServer:
             self.running = True
 
             print(f"Сервер запущен на http://{self.host}:{self.port}")
-            print("=" * 50)
-            print("Откройте в браузере: http://localhost:" + str(self.port))
-            print("=" * 50)
+            print("База данных SQLite подключена (data.db)")
 
             while self.running:
                 try:
@@ -55,7 +89,6 @@ class SimpleHTTPServer:
                     client_thread.start()
                 except OSError:
                     break
-
         except OSError as e:
             if e.errno == 48 or e.errno == 10048:
                 print(f"Порт {self.port} уже занят!")
@@ -106,24 +139,13 @@ class SimpleHTTPServer:
                 return self.json_response(self.get_stats())
             elif path == '/api/techniques':
                 return self.json_response(self.get_techniques())
-            elif path == '/api/feedback':
-                return self.json_response(self.get_feedback())
-            elif path == '/api/questionnaires':
-                return self.json_response(self.get_questionnaires())
-            elif path == '/api/journal':
-                return self.json_response(self.get_journal())
-            elif path == '/api/stats/summary':
-                return self.json_response(self.get_stats_summary())
 
         # POST запросы
         if method == 'POST':
             if path == '/api/log-stress':
                 return self.handle_stress_log(request_data)
             elif path == '/api/start-breathing':
-                return self.json_response({
-                    "status": "success",
-                    "message": "Дыхательное упражнение начато"
-                })
+                return self.json_response({"status": "success", "message": "Дыхательное упражнение начато"})
             elif path == '/api/submit-feedback':
                 return self.handle_feedback_submission(request_data)
             elif path == '/api/submit-journal':
@@ -166,104 +188,47 @@ class SimpleHTTPServer:
     def serve_static(self, path):
         """Раздача статических файлов"""
         try:
-            # Убираем /static/ из пути
-            file_path = path[8:]  # len('/static/') = 8
+            file_path = path[8:]  # strip /static/
             full_path = os.path.join(self.static_dir, file_path.replace('/', os.sep))
             
             with open(full_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            # Определяем Content-Type
-            if path.endswith('.css'):
-                content_type = 'text/css'
-            elif path.endswith('.js'):
-                content_type = 'application/javascript'
-            else:
-                content_type = 'text/plain'
+            if path.endswith('.css'): content_type = 'text/css'
+            elif path.endswith('.js'): content_type = 'application/javascript'
+            else: content_type = 'text/plain'
             
             return self.static_response(content, content_type)
-        except FileNotFoundError:
+        except Exception:
             return self.error_response(404, "Файл не найден")
 
     def html_response(self, html):
-        """Формирование HTML ответа"""
         body = html.encode('utf-8')
-        headers = [
-            "HTTP/1.1 200 OK",
-            "Content-Type: text/html; charset=utf-8",
-            f"Content-Length: {len(body)}",
-            "Connection: close",
-            "",
-            ""
-        ]
-        return "\r\n".join(headers).encode('utf-8') + body
+        headers = ["HTTP/1.1 200 OK", "Content-Type: text/html; charset=utf-8", f"Content-Length: {len(body)}", "Connection: close", "", ""]
+        return "\\r\\n".join(headers).encode('utf-8') + body
 
     def json_response(self, data):
-        """Формирование JSON ответа"""
         json_data = json.dumps(data, ensure_ascii=False, indent=2)
         body = json_data.encode('utf-8')
-        headers = [
-            "HTTP/1.1 200 OK",
-            "Content-Type: application/json; charset=utf-8",
-            "Access-Control-Allow-Origin: *",
-            f"Content-Length: {len(body)}",
-            "Connection: close",
-            "",
-            ""
-        ]
-        return "\r\n".join(headers).encode('utf-8') + body
+        headers = ["HTTP/1.1 200 OK", "Content-Type: application/json; charset=utf-8", "Access-Control-Allow-Origin: *", f"Content-Length: {len(body)}", "Connection: close", "", ""]
+        return "\\r\\n".join(headers).encode('utf-8') + body
 
     def static_response(self, content, content_type):
-        """Формирование ответа для статических файлов"""
         body = content.encode('utf-8')
-        headers = [
-            "HTTP/1.1 200 OK",
-            f"Content-Type: {content_type}; charset=utf-8",
-            f"Content-Length: {len(body)}",
-            "Connection: close",
-            "",
-            ""
-        ]
-        return "\r\n".join(headers).encode('utf-8') + body
+        headers = ["HTTP/1.1 200 OK", f"Content-Type: {content_type}; charset=utf-8", f"Content-Length: {len(body)}", "Connection: close", "", ""]
+        return "\\r\\n".join(headers).encode('utf-8') + body
 
     def favicon_response(self):
-        """Пустой ответ для favicon"""
-        headers = [
-            "HTTP/1.1 204 No Content",
-            "Connection: close",
-            "",
-            ""
-        ]
-        return "\r\n".join(headers).encode('utf-8')
+        return "\\r\\n".join(["HTTP/1.1 204 No Content", "Connection: close", "", ""]).encode('utf-8')
 
     def error_response(self, code, message):
-        """Формирование ответа с ошибкой"""
-        html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head><title>Ошибка {code}</title></head>
-        <body>
-            <h1>Ошибка {code}</h1>
-            <p>{message}</p>
-            <a href="/">Вернуться на главную</a>
-        </body>
-        </html>
-        """
+        html = f"<html><body><h1>Ошибка {code}</h1><p>{message}</p></body></html>"
         body = html.encode('utf-8')
-        status = 'Not Found' if code == 404 else 'Error'
-        headers = [
-            f"HTTP/1.1 {code} {status}",
-            "Content-Type: text/html; charset=utf-8",
-            f"Content-Length: {len(body)}",
-            "Connection: close",
-            "",
-            ""
-        ]
-        return "\r\n".join(headers).encode('utf-8') + body
+        headers = [f"HTTP/1.1 {code} Error", "Content-Type: text/html; charset=utf-8", f"Content-Length: {len(body)}", "Connection: close", "", ""]
+        return "\\r\\n".join(headers).encode('utf-8') + body
 
     def parse_body(self, request_data):
-        """Извлечение тела запроса"""
-        lines = request_data.split('\n')
+        lines = request_data.split('\\n')
         body_start = False
         body = ""
         for line in lines:
@@ -275,127 +240,79 @@ class SimpleHTTPServer:
         return body
 
     def handle_stress_log(self, request_data):
-        """Обработка логирования стресса"""
         try:
             body = self.parse_body(request_data)
             data = json.loads(body) if body else {}
+            level = int(data.get('level', 0))
+            ts = datetime.now().isoformat()
             
-            stress_entry = {
-                "level": int(data.get('level', 0)),
-                "timestamp": datetime.now().isoformat()
-            }
-            self.stress_logs.append(stress_entry)
-            print(f"Получен уровень стресса: {stress_entry['level']}")
+            conn = self.get_db_connection()
+            conn.execute('INSERT INTO stress_logs (level, timestamp) VALUES (?, ?)', (level, ts))
+            conn.commit()
+            conn.close()
 
-            return self.json_response({
-                "status": "success",
-                "message": "Уровень стресса записан",
-                "level": stress_entry['level']
-            })
+            print(f"Получен уровень стресса: {level}")
+            return self.json_response({"status": "success", "message": "Уровень стресса записан", "level": level})
         except Exception as e:
             return self.json_response({"status": "error", "message": str(e)})
 
     def handle_feedback_submission(self, request_data):
-        """Обработка отправки анкеты"""
         try:
             body = self.parse_body(request_data)
-            data = json.loads(body) if body else {}
+            data_json = body if body else "{}"
+            ts = datetime.now().isoformat()
             
-            questionnaire_entry = {
-                "data": data,
-                "timestamp": datetime.now().isoformat()
-            }
-            self.questionnaires.append(questionnaire_entry)
-            print(f"Получена анкета №{len(self.questionnaires)}")
-
-            return self.json_response({
-                "status": "success",
-                "message": "Анкета успешно отправлена! Спасибо за ваши ответы."
-            })
+            conn = self.get_db_connection()
+            conn.execute('INSERT INTO questionnaires (data_json, timestamp) VALUES (?, ?)', (data_json, ts))
+            conn.commit()
+            conn.close()
+            
+            print(f"Получена анкета")
+            return self.json_response({"status": "success", "message": "Анкета успешно отправлена!"})
         except Exception as e:
             return self.json_response({"status": "error", "message": str(e)})
 
     def handle_journal_submission(self, request_data):
-        """Обработка отправки записи в журнал"""
         try:
             body = self.parse_body(request_data)
             data = json.loads(body) if body else {}
+            text = data.get("text", "")
+            mood = data.get("mood", "neutral")
+            ts = datetime.now().isoformat()
             
-            journal_entry = {
-                "text": data.get("text", ""),
-                "mood": data.get("mood", "neutral"),
-                "timestamp": datetime.now().isoformat()
-            }
-            self.journal_entries.append(journal_entry)
-            print(f"Получена запись в журнал №{len(self.journal_entries)}")
+            conn = self.get_db_connection()
+            conn.execute('INSERT INTO journal_entries (text, mood, timestamp) VALUES (?, ?, ?)', (text, mood, ts))
+            conn.commit()
+            conn.close()
 
-            return self.json_response({
-                "status": "success",
-                "message": "Запись сохранена в вашем журнале"
-            })
+            print(f"Получена запись в журнал")
+            return self.json_response({"status": "success", "message": "Запись сохранена"})
         except Exception as e:
             return self.json_response({"status": "error", "message": str(e)})
 
     def get_stats(self):
-        """Получение статистики"""
+        conn = self.get_db_connection()
+        c_logs = conn.execute('SELECT COUNT(*) FROM stress_logs').fetchone()[0]
+        c_journal = conn.execute('SELECT COUNT(*) FROM journal_entries').fetchone()[0]
+        c_quest = conn.execute('SELECT COUNT(*) FROM questionnaires').fetchone()[0]
+        
+        # Get raw logs for Chart.js
+        logs = conn.execute('SELECT level, timestamp FROM stress_logs ORDER BY timestamp ASC').fetchall()
+        logs_list = [{"level": r['level'], "timestamp": r['timestamp']} for r in logs]
+        
+        conn.close()
+
         return {
             "status": "success",
             "data": {
                 "server": "Мир спокойствия",
-                "version": "2.0.0",
+                "version": "3.0.0 (SQLite Edition)",
                 "timestamp": datetime.now().isoformat(),
-                "questionnaires_count": len(self.questionnaires),
-                "journal_entries_count": len(self.journal_entries),
-                "stress_logs_count": len(self.stress_logs)
+                "questionnaires_count": c_quest,
+                "journal_entries_count": c_journal,
+                "stress_logs_count": c_logs,
+                "stress_logs_data": logs_list
             }
-        }
-
-    def get_stats_summary(self):
-        """Полная статистика"""
-        stress_reductions = []
-        for q in self.questionnaires:
-            before = q.get('data', {}).get('before', {})
-            after = q.get('data', {}).get('after', {})
-            if before.get('stress') and after.get('stress'):
-                reduction = int(before['stress']) - int(after['stress'])
-                if reduction > 0:
-                    stress_reductions.append(reduction)
-
-        avg_stress_reduction = round((sum(stress_reductions) / len(stress_reductions) * 10)) if stress_reductions else 0
-
-        return {
-            "status": "success",
-            "stats": {
-                "totalQuestionnaires": len(self.questionnaires),
-                "totalJournalEntries": len(self.journal_entries),
-                "totalStressLogs": len(self.stress_logs),
-                "avgStressReduction": avg_stress_reduction,
-                "avgPracticeDuration": 15
-            }
-        }
-
-    def get_questionnaires(self):
-        """Получение всех анкет"""
-        return {
-            "status": "success",
-            "questionnaires": self.questionnaires[-50:],
-            "total": len(self.questionnaires)
-        }
-
-    def get_journal(self):
-        """Получение всех записей журнала"""
-        return {
-            "status": "success",
-            "entries": self.journal_entries[-50:],
-            "total": len(self.journal_entries)
-        }
-
-    def get_feedback(self):
-        """Получение всех отзывов"""
-        return {
-            "status": "success",
-            "journalEntries": self.journal_entries[-10:],
-            "questionnairesCount": len(self.questionnaires)
         }
 
     def get_techniques(self):
@@ -408,50 +325,22 @@ class SimpleHTTPServer:
             ]
         }
 
-
 def main():
-    """Запуск сервера"""
     print("=" * 50)
-    print("МИР СПОКОЙСТВИЯ v2.0")
-    print("Реструктурированная версия")
+    print("МИР СПОКОЙСТВИЯ v3.0 (SQLite)")
     print("=" * 50)
-
-    # Получаем порт из переменной окружения (для Render) или используем 5000
-    port = int(os.environ.get('PORT', 5000))
-    
-    # На Render используем 0.0.0.0, локально - localhost
+    port = int(os.environ.get('PORT', 5001))
     host = '0.0.0.0' if os.environ.get('RENDER') else 'localhost'
-    
     server = SimpleHTTPServer(host=host, port=port)
-    print(f"Запуск сервера на {host}:{port}...")
-
+    
     if server.start():
-        print(f"\nСервер запущен на http://{host}:{port}")
-        print("=" * 50)
-        print("Доступные страницы:")
-        print("  • Главная: /")
-        print("  • Дыхательные практики: /breathing")
-        print("  • Техники релаксации: /techniques")
-        print("  • Статистика: /statistics")
-        print("  • Анкетирование: /questionnaire")
-        print("  • Личный журнал: /journal")
-        print("  • Медиа контент: /media")
-        print("  • Экстренная помощь: /emergency")
-        print("=" * 50)
-        print("Для остановки нажмите Ctrl+C")
-
         try:
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
             server.stop()
-            print(f"\nСтатистика сервера:")
-            print(f"  • Анкет: {len(server.questionnaires)}")
-            print(f"  • Записей в журнале: {len(server.journal_entries)}")
-            print(f"  • Логов стресса: {len(server.stress_logs)}")
     else:
         print(f"Не удалось запустить сервер на порту {port}")
-
 
 if __name__ == "__main__":
     main()

@@ -5,25 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мир спокойствия</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/tranquility/static/css/style.css">
 </head>
 <body class="page-index">
     <nav>
         <div class="container nav-container">
-            <a href="/" class="logo">
+            <a href="/tranquility/" class="logo">
                 <i class="fas fa-spa"></i>
                 <span>Мир спокойствия</span>
             </a>
 
             <ul class="nav-links">
-                <li><a href="/">Главная</a></li>
-                <li><a href="/breathing">Дыхание</a></li>
-                <li><a href="/techniques">Техники</a></li>
-                <li><a href="/statistics">Статистика</a></li>
-                <li><a href="/questionnaire">Анкета</a></li>
-                <li><a href="/journal">Журнал</a></li>
-                <li><a href="/media">Медиа</a></li>
-                <li><a href="/emergency">Помощь</a></li>
+                <li><a href="/tranquility/">Главная</a></li>
+                <li><a href="/tranquility/breathing">Дыхание</a></li>
+                <li><a href="/tranquility/techniques">Техники</a></li>
+                <li><a href="/tranquility/statistics">Статистика</a></li>
+                <li><a href="/tranquility/questionnaire">Анкета</a></li>
+                <li><a href="/tranquility/journal">Журнал</a></li>
+                <li><a href="/tranquility/media">Медиа</a></li>
+                <li><a href="/tranquility/emergency">Помощь</a></li>
             </ul>
         </div>
     </nav>
@@ -34,29 +34,29 @@
             <p>Техники управления стрессом и дыхательные практики</p>
 
             <div style="margin-top: 2rem;">
-                <a href="/breathing" class="btn btn-hero">
+                <a href="/tranquility/breathing" class="btn btn-hero">
                     <i class="fas fa-wind"></i> Дыхательные упражнения
                 </a>
-                <a href="/emergency" class="btn btn-hero-emergency">
+                <a href="/tranquility/emergency" class="btn btn-hero-emergency">
                     <i class="fas fa-first-aid"></i> Экстренная помощь
                 </a>
             </div>
         </div>
 
         <div class="new-features">
-            <a href="/questionnaire" class="new-feature">
+            <a href="/tranquility/questionnaire" class="new-feature">
                 <i class="fas fa-clipboard-check"></i>
                 <h3>Анкетирование</h3>
                 <p>Оцените своё состояние до и после практик</p>
             </a>
 
-            <a href="/journal" class="new-feature">
+            <a href="/tranquility/journal" class="new-feature">
                 <i class="fas fa-book"></i>
                 <h3>Личный журнал</h3>
                 <p>Записывайте свои мысли и ощущения</p>
             </a>
 
-            <a href="/media" class="new-feature">
+            <a href="/tranquility/media" class="new-feature">
                 <i class="fas fa-photo-video"></i>
                 <h3>Медитативный контент</h3>
                 <p>Расслабляющие видео и изображения</p>
@@ -64,19 +64,19 @@
         </div>
 
         <div class="features">
-            <a href="/breathing" class="feature-card">
+            <a href="/tranquility/breathing" class="feature-card">
                 <div class="feature-icon"><i class="fas fa-lungs"></i></div>
                 <h3>Дыхательные техники</h3>
                 <p>Практики для снижения тревожности и панических атак</p>
             </a>
 
-            <a href="/techniques" class="feature-card">
+            <a href="/tranquility/techniques" class="feature-card">
                 <div class="feature-icon"><i class="fas fa-brain"></i></div>
                 <h3>Медитация</h3>
                 <p>Техники для тренировки внимания и снижения стресса</p>
             </a>
 
-            <a href="/statistics" class="feature-card">
+            <a href="/tranquility/statistics" class="feature-card">
                 <div class="feature-icon"><i class="fas fa-heartbeat"></i></div>
                 <h3>Статистика</h3>
                 <p>Анализ вашего прогресса и эффективности практик</p>
@@ -114,7 +114,7 @@
         </div>
     </footer>
 
-    <script src="/static/js/main.js"></script>
+    <script src="/tranquility/static/js/main.js"></script>
     <script>
         // Трекер стресса
         document.querySelectorAll('.stress-btn').forEach(btn => {
@@ -141,7 +141,7 @@
                 result.style.display = 'block';
 
                 // Отправляем на сервер
-                fetch('/api/log-stress', {
+                fetch('/tranquility/api/log-stress', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({level: level, time: new Date().toISOString()})

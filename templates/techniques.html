@@ -7,10 +7,11 @@
     <title>Мир спокойствия - Техники заземления</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/tranquility/static/css/style.css">
+    <link rel="stylesheet" href="/tranquility/static/css/v2.css?v=2">
     <style>
         .technique-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 24px;
             margin-top: 2rem;
             margin-bottom: 3rem;
@@ -24,6 +25,11 @@
             padding: 30px;
             text-align: left;
             transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
         }
 
         .tech-card:hover {
@@ -31,9 +37,15 @@
             background: rgba(30, 41, 59, 0.7);
         }
 
+        .tech-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
         .tech-icon {
             font-size: 2.5rem;
-            margin-bottom: 20px;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -44,6 +56,174 @@
             color: var(--text-muted);
             line-height: 1.8;
             margin-top: 15px;
+            flex-grow: 1;
+        }
+
+        .action-area {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            padding-top: 20px;
+        }
+
+        /* 5-4-3-2-1 Styles */
+        .dots-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--secondary-color);
+            transition: all 0.3s ease;
+        }
+
+        .dot.filled {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+
+        /* Anchor Styles */
+        .anchor-btn {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid var(--primary-color);
+            color: var(--text-color);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .anchor-btn:active {
+            transform: scale(0.9);
+            background: var(--primary-color);
+            box-shadow: 0 0 30px var(--primary-color);
+        }
+
+        .ripple-layer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            opacity: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        @keyframes rippleAction {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(2.5);
+                opacity: 0;
+                border-width: 0;
+            }
+        }
+
+        .ripple-anim {
+            animation: rippleAction 2s infinite;
+        }
+
+        /* Worry Box Styles */
+        .worry-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-family: inherit;
+            resize: none;
+            height: 60px;
+            transition: border-color 0.3s;
+        }
+
+        .worry-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .worry-item {
+            position: absolute;
+            background: rgba(239, 68, 68, 0.1);
+            color: #fca5a5;
+            padding: 10px 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            pointer-events: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80%;
+            z-index: 10;
+            transition: all 3s ease-in;
+            opacity: 1;
+            left: 50%;
+            top: 60%;
+            transform: translate(-50%, -50%);
+        }
+
+        .worry-releasing {
+            top: -20%;
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.5);
+            filter: blur(5px);
+        }
+
+        .success-msg {
+            color: var(--secondary-color);
+            text-align: center;
+            font-weight: bold;
+            display: none;
+            margin-top: 10px;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dynamic-instruction {
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 5px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
@@ -71,51 +251,280 @@
     <div class="container">
         <h1 style="text-align: center; margin-top: 2rem;"><i class="fas fa-brain"></i> Техники заземления и медитации
         </h1>
-        <p style="text-align: center; color: var(--text-muted); max-width: 600px; margin: 10px auto;">Практики для
-            возвращения в настоящий момент и снижения тревожности.</p>
+        <p style="text-align: center; color: var(--text-muted); max-width: 600px; margin: 10px auto;">
+            Практики для возвращения в настоящий момент. Взаимодействуйте с карточками ниже, чтобы сайт сам провел вас
+            через процесс.
+        </p>
 
         <div class="technique-grid">
-            <div class="tech-card">
-                <i class="fas fa-hand-sparkles tech-icon"></i>
-                <h3 style="margin-bottom: 10px;">Метод 5-4-3-2-1</h3>
-                <p>Мощная техника заземления при сильной тревоге.</p>
-                <ol class="steps">
-                    <li><b>5</b> вещей, которые вы видите</li>
-                    <li><b>4</b> вещи, которые можно потрогать</li>
-                    <li><b>3</b> вещи, которые вы слышите</li>
-                    <li><b>2</b> вещи, которые вы можете понюхать</li>
-                    <li><b>1</b> вещь, которую можно попробовать на вкус</li>
-                </ol>
+
+            <!-- Technique 1: 5-4-3-2-1 -->
+            <div class="tech-card" id="card-54321">
+                <div class="tech-header">
+                    <i class="fas fa-hand-sparkles tech-icon"></i>
+                    <h3 style="margin: 0;">Метод 5-4-3-2-1</h3>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom:10px;">Мощная сенсорная техника при сильной тревоге.
+                </p>
+
+                <div class="action-area" style="justify-content: flex-start;">
+                    <button class="btn btn-hero" id="btn-start-54321" onclick="start54321()" style="width:100%">Начать
+                        практику</button>
+
+                    <div id="ui-54321" style="display:none; width:100%; text-align:center;">
+                        <div class="dynamic-instruction" id="instruct-54321">Найдите 5 вещей, которые вы видите</div>
+                        <div class="dots-container" id="dots-54321"></div>
+                        <button class="btn btn-secondary" onclick="advance54321()" id="btn-next-54321"
+                            style="width:100%; margin-top: 15px;">
+                            Я нашел это <i class="fas fa-check"></i>
+                        </button>
+                        <div class="success-msg" id="success-54321">Практика завершена. Вы молодец!</div>
+                    </div>
+                </div>
             </div>
 
-            <div class="tech-card">
-                <i class="fas fa-search-location tech-icon"></i>
-                <h3 style="margin-bottom: 10px;">Техника "Якорь"</h3>
-                <p>Помогает сфокусировать внимание на теле.</p>
-                <ol class="steps">
-                    <li>Сядьте ровно</li>
-                    <li>Плотно прижмите стопы к полу</li>
-                    <li>Сконцентрируйтесь на ощущении опоры</li>
-                    <li>Дышите медленно и глубоко</li>
-                </ol>
+            <!-- Technique 2: Anchor -->
+            <div class="tech-card" style="position: relative;">
+                <div class="tech-header">
+                    <i class="fas fa-search-location tech-icon"
+                        style="background: linear-gradient(135deg, #f59e0b, #fbbf24); -webkit-background-clip: text;"></i>
+                    <h3 style="margin: 0;">Техника "Якорь"</h3>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom:10px;">Фокус на теле. Удерживайте кнопку,
+                    концентрируясь на том, как ваши стопы давят на пол.</p>
+
+                <div class="action-area">
+                    <div style="position: relative; width: 120px; height: 120px;">
+                        <div class="ripple-layer" id="anchor-ripple"></div>
+                        <button class="anchor-btn" id="anchor-btn" onmousedown="startAnchor()" onmouseup="stopAnchor()"
+                            ontouchstart="startAnchor()" ontouchend="stopAnchor()">
+                            Опора
+                        </button>
+                    </div>
+                    <p id="anchor-text"
+                        style="color: var(--text-muted); text-align: center; margin-top: 15px; height: 20px;">Нажмите и
+                        удерживайте</p>
+                </div>
             </div>
 
-            <div class="tech-card">
-                <i class="fas fa-headphones tech-icon"></i>
-                <h3 style="margin-bottom: 10px;">Медитация звуков</h3>
-                <p>Направьте внимание на окружающую среду.</p>
-                <ol class="steps">
-                    <li>Закройте глаза</li>
-                    <li>Прислушайтесь к самым близким звукам</li>
-                    <li>Переключитесь на самые далекие звуки</li>
-                    <li>Зайдите в раздел <a href="/tranquility/media" style="color: #60a5fa;">Медиа</a> для практики
-                    </li>
-                </ol>
+            <!-- Technique 3: Worry Box -->
+            <div class="tech-card" id="card-worry" style="overflow: hidden;">
+                <div class="tech-header">
+                    <i class="fas fa-box-open tech-icon"
+                        style="background: linear-gradient(135deg, #ef4444, #f87171); -webkit-background-clip: text;"></i>
+                    <h3 style="margin: 0;">Коробка тревог</h3>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom:10px;">Напишите тревожную мысль и физически отпустите
+                    её.</p>
+
+                <div class="action-area" style="width: 100%;">
+                    <textarea class="worry-input" id="worry-text" placeholder="Меня сейчас тревожит..."></textarea>
+                    <button class="btn btn-hero" onclick="releaseWorry()"
+                        style="width:100%; background: linear-gradient(135deg, #ef4444, #f87171); border:none;">
+                        Отпустить мысль <i class="fas fa-wind"></i>
+                    </button>
+                    <p class="success-msg" id="worry-success"
+                        style="color: #f87171; text-align: center; font-size: 0.9em;">Мысль отпущена.</p>
+                </div>
             </div>
+
+            <!-- Technique 4: Mini Player -->
+            <div class="tech-card">
+                <div class="tech-header">
+                    <i class="fas fa-headphones tech-icon"
+                        style="background: linear-gradient(135deg, #8b5cf6, #c084fc); -webkit-background-clip: text;"></i>
+                    <h3 style="margin: 0;">Минута звука</h3>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom:10px;">Закройте глаза и сконцентрируйтесь только на
+                    этом звуке.</p>
+
+                <div class="action-area" style="width: 100%;">
+                    <audio id="mini-audio" src="/tranquility/static/media/zen.m4a" loop></audio>
+                    <button class="btn btn-secondary" id="mini-play-btn" onclick="toggleMiniPlayer()"
+                        style="width: 100%; margin-bottom: 10px;">
+                        <i class="fas fa-play" id="mini-play-icon"></i> Слушать тибетскую чашу
+                    </button>
+                    <div id="mini-timer"
+                        style="font-size: 1.5rem; font-weight: bold; color: var(--secondary-color); opacity: 0; transition: opacity 0.3s; text-align:center;">
+                        60</div>
+                </div>
+            </div>
+
         </div>
     </div>
 
+    <script>
+        // --- 5-4-3-2-1 Logic ---
+        const steps54321 = [
+            { count: 5, text: "Найдите 5 вещей, которые вы видите вокруг" },
+            { count: 4, text: "Коснитесь 4 вещей, которые вы можете потрогать" },
+            { count: 3, text: "Прислушайтесь к 3 звукам" },
+            { count: 2, text: "Почувствуйте 2 запаха" },
+            { count: 1, text: "Ощутите 1 вкус во рту (или сделайте глоток воды)" }
+        ];
+
+        let currentStep54321 = 0;
+        let currentDot = 0;
+
+        function start54321() {
+            document.getElementById('btn-start-54321').style.display = 'none';
+            document.getElementById('ui-54321').style.display = 'block';
+            currentStep54321 = 0;
+            renderStep54321();
+        }
+
+        function renderStep54321() {
+            if (currentStep54321 >= steps54321.length) {
+                document.getElementById('instruct-54321').style.display = 'none';
+                document.getElementById('dots-54321').style.display = 'none';
+                document.getElementById('btn-next-54321').style.display = 'none';
+                document.getElementById('success-54321').style.display = 'block';
+                return;
+            }
+
+            const step = steps54321[currentStep54321];
+            document.getElementById('instruct-54321').textContent = step.text;
+
+            const dotsContainer = document.getElementById('dots-54321');
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < step.count; i++) {
+                dotsContainer.innerHTML += '<div class="dot"></div>';
+            }
+            currentDot = 0;
+            updateBtnText54321();
+        }
+
+        function advance54321() {
+            const dots = document.querySelectorAll('#dots-54321 .dot');
+            if (currentDot < dots.length) {
+                dots[currentDot].classList.add('filled');
+                currentDot++;
+                updateBtnText54321();
+
+                if (currentDot === dots.length) {
+                    setTimeout(() => {
+                        currentStep54321++;
+                        renderStep54321();
+                    }, 600);
+                }
+            }
+        }
+
+        function updateBtnText54321() {
+            const btn = document.getElementById('btn-next-54321');
+            const step = steps54321[currentStep54321];
+            if (!step) return;
+            const remaining = step.count - currentDot;
+            if (remaining > 0) {
+                btn.innerHTML = `Я нашел это (${remaining} осталось) <i class="fas fa-check"></i>`;
+            } else {
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+            }
+        }
+
+        // --- Anchor Logic ---
+        let anchorInterval;
+        let anchorSeconds = 0;
+
+        function startAnchor() {
+            document.getElementById('anchor-ripple').classList.add('ripple-anim');
+            document.getElementById('anchor-btn').style.background = 'var(--primary-color)';
+            document.getElementById('anchor-text').textContent = 'Удерживайте фокус на теле...';
+
+            anchorInterval = setInterval(() => {
+                anchorSeconds++;
+                if (anchorSeconds > 3) {
+                    document.getElementById('anchor-text').textContent = 'Дышите медленно и глубоко...';
+                }
+            }, 1000);
+        }
+
+        function stopAnchor() {
+            document.getElementById('anchor-ripple').classList.remove('ripple-anim');
+            document.getElementById('anchor-btn').style.background = 'rgba(59, 130, 246, 0.1)';
+
+            clearInterval(anchorInterval);
+
+            if (anchorSeconds > 5) {
+                document.getElementById('anchor-text').textContent = "Отличная работа. Вы заземлены.";
+            } else {
+                document.getElementById('anchor-text').textContent = "Нажмите и удерживайте";
+            }
+            anchorSeconds = 0;
+        }
+
+        // --- Worry Box Logic ---
+        function releaseWorry() {
+            const input = document.getElementById('worry-text');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Create floating element
+            const card = document.getElementById('card-worry');
+            const floater = document.createElement('div');
+            floater.className = 'worry-item';
+            floater.textContent = text;
+            card.appendChild(floater);
+
+            // Clear input
+            input.value = '';
+
+            // Trigger animation
+            setTimeout(() => {
+                floater.classList.add('worry-releasing');
+            }, 50);
+
+            // Cleanup
+            setTimeout(() => {
+                card.removeChild(floater);
+                const msg = document.getElementById('worry-success');
+                msg.style.display = 'block';
+                setTimeout(() => msg.style.display = 'none', 3000);
+            }, 3000);
+        }
+
+        // --- Mini Player Logic ---
+        let miniAudioTimer;
+        let timeLeft = 60;
+        let isMiniPlaying = false;
+
+        function toggleMiniPlayer() {
+            const audio = document.getElementById('mini-audio');
+            const icon = document.getElementById('mini-play-icon');
+            const btn = document.getElementById('mini-play-btn');
+            const timerDisplay = document.getElementById('mini-timer');
+
+            if (isMiniPlaying) {
+                audio.pause();
+                clearInterval(miniAudioTimer);
+                icon.className = 'fas fa-play';
+                btn.innerHTML = '<i class="fas fa-play" id="mini-play-icon"></i> Продолжить';
+                timerDisplay.style.opacity = '0';
+                isMiniPlaying = false;
+            } else {
+                audio.play().then(() => {
+                    isMiniPlaying = true;
+                    icon.className = 'fas fa-pause';
+                    btn.innerHTML = '<i class="fas fa-pause" id="mini-play-icon"></i> Остановить';
+                    timerDisplay.style.opacity = '1';
+
+                    if (timeLeft === 0) timeLeft = 60;
+
+                    miniAudioTimer = setInterval(() => {
+                        timeLeft--;
+                        timerDisplay.textContent = timeLeft;
+                        if (timeLeft <= 0) {
+                            toggleMiniPlayer();
+                            btn.innerHTML = '<i class="fas fa-redo" id="mini-play-icon"></i> Начать заново';
+                            timeLeft = 60;
+                        }
+                    }, 1000);
+                }).catch(e => console.error("Audio block", e));
+            }
+        }
+    </script>
     <script src="/tranquility/static/js/main.js"></script>
+    <script src="/tranquility/static/js/v2.js?v=2" defer></script>
 </body>
 
 </html>

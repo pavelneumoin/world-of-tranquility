@@ -1,0 +1,18 @@
+{
+  "name": "Мир спокойствия",
+  "short_name": "Спокойствие",
+  "description": "Детское приложение для управления стрессом и тревогой",
+  "start_url": "./Мир спокойствия.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#2a1f4a",
+  "theme_color": "#8b6fd4",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%238b6fd4'/><text x='96' y='130' font-size='110' text-anchor='middle'>🐱</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}

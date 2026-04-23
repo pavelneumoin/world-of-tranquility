@@ -7,11 +7,12 @@
     <title>Мир спокойствия - Статистика</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/tranquility/static/css/style.css">
+    <link rel="stylesheet" href="/tranquility/static/css/v2.css?v=2">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             margin-bottom: 2rem;
             margin-top: 2rem;
@@ -52,12 +53,47 @@
             border: 1px solid var(--glass-border);
             border-radius: 20px;
             padding: 30px;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
             position: relative;
             height: 400px;
         }
 
-        @media (max-width: 768px) {
+        /* 2 Column visual grid for the new charts */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 3rem;
+        }
+
+        .chart-box {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            height: 350px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-box canvas {
+            flex-grow: 1;
+        }
+
+
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
             .stats-grid {
                 grid-template-columns: 1fr;
             }
@@ -86,7 +122,7 @@
     </nav>
 
     <div class="container">
-        <h1 style="text-align: center; margin-top: 2rem;"><i class="fas fa-chart-line"></i> Ваша аналитика</h1>
+        <h1 style="text-align: center; margin-top: 2rem;"><i class="fas fa-chart-pie"></i> Ваша аналитика</h1>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">
             Отслеживайте динамику вашего эмоционального состояния и эффективность практик.
         </p>
@@ -107,39 +143,64 @@
                 <div class="stat-value" id="val-logs">-</div>
                 <div class="stat-label">Оценок стресса</div>
             </div>
+            <div class="stat-card" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.05);">
+                <i class="fas fa-arrow-down stat-icon"
+                    style="background: linear-gradient(135deg, #10b981, #34d399); -webkit-background-clip: text;"></i>
+                <div class="stat-value" id="val-reduction" style="color: #34d399;">-</div>
+                <div class="stat-label">Снижение стресса (баллы)</div>
+            </div>
         </div>
 
         <div class="chart-container">
-            <h3 style="margin-bottom: 20px; color: #fff;">График уровня стресса</h3>
+            <h3 style="margin-bottom: 10px; color: #fff; text-align: center;">Динамика уровня стресса</h3>
             <canvas id="stressChart"></canvas>
         </div>
+
+        <div class="chart-grid">
+            <div class="chart-box">
+                <h3 style="margin-bottom: 10px; color: #fff; text-align: center;">Распределение настроений</h3>
+                <canvas id="moodChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <h3 style="margin-bottom: 10px; color: #fff; text-align: center;">Популярность техник</h3>
+                <canvas id="techChart"></canvas>
+            </div>
+        </div>
+
     </div>
 
     <script src="/tranquility/static/js/main.js"></script>
     <script>
+        // Chart.js defaults for darker theme
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
+
         document.addEventListener('DOMContentLoaded', function () {
             fetch('/tranquility/api/stats')
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        // Обновляем карточки
+                        // Counters
                         document.getElementById('val-questionnaires').textContent = data.data.questionnaires_count;
                         document.getElementById('val-journals').textContent = data.data.journal_entries_count;
                         document.getElementById('val-logs').textContent = data.data.stress_logs_count;
 
-                        // Отрисовываем график
-                        const logs = data.data.stress_logs_data || [];
-                        renderChart(logs);
+                        let reduction = data.data.avg_stress_reduction || 0;
+                        document.getElementById('val-reduction').textContent = '-' + reduction;
+
+                        // Charts
+                        renderStressChart(data.data.stress_logs_data || []);
+                        renderMoodChart(data.data.mood_distribution || {});
+                        renderTechChart(data.data.techniques_stats || {});
                     }
                 })
                 .catch(err => console.error("Ошибка загрузки статистики:", err));
         });
 
-        function renderChart(logs) {
+        function renderStressChart(logs) {
             const ctx = document.getElementById('stressChart').getContext('2d');
 
             if (logs.length === 0) {
-                // Если нет данных, покажем плейсхолдер
                 logs = [
                     { timestamp: new Date(Date.now() - 86400000 * 4).toISOString(), level: 7 },
                     { timestamp: new Date(Date.now() - 86400000 * 3).toISOString(), level: 5 },
@@ -149,19 +210,17 @@
                 ];
             }
 
-            // Сортировка по времени
             logs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
             const labels = logs.map(log => {
                 const d = new Date(log.timestamp);
                 return `${d.getDate()}.${d.getMonth() + 1} ${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')}`;
             });
-
             const dataPoints = logs.map(log => log.level);
 
             const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.5)'); // secondary color 
-            gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.5)');
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
 
             new Chart(ctx, {
                 type: 'line',
@@ -170,48 +229,113 @@
                     datasets: [{
                         label: 'Уровень стресса (1-10)',
                         data: dataPoints,
-                        borderColor: '#10b981',
+                        borderColor: '#3b82f6',
                         backgroundColor: gradient,
                         borderWidth: 3,
                         pointBackgroundColor: '#fff',
-                        pointBorderColor: '#10b981',
+                        pointBorderColor: '#3b82f6',
                         pointBorderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
+                        pointRadius: 4,
                         fill: true,
-                        tension: 0.4 // Smooth curves
+                        tension: 0.4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#e2e8f0' }
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
                         y: {
-                            min: 0,
-                            max: 10,
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)',
-                                drawBorder: false
-                            },
-                            ticks: { color: '#94a3b8' }
+                            min: 0, max: 10,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
                         },
-                        x: {
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)',
-                                drawBorder: false
-                            },
-                            ticks: { color: '#94a3b8' }
-                        }
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function renderMoodChart(moodData) {
+            const ctx = document.getElementById('moodChart').getContext('2d');
+            const labels = Object.keys(moodData);
+            const data = Object.values(moodData);
+
+            if (labels.length === 0) {
+                labels.push("Нет данных");
+                data.push(1);
+            }
+
+            // Beautiful palette
+            const bgColors = [
+                'rgba(16, 185, 129, 0.8)', // Calm (Green)
+                'rgba(59, 130, 246, 0.8)', // Sad (Blue)
+                'rgba(245, 158, 11, 0.8)', // Tired (Yellow/Orange)
+                'rgba(239, 68, 68, 0.8)',  // Anxiety/Anger (Red)
+                'rgba(139, 92, 246, 0.8)'  // Purple
+            ];
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: bgColors,
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        function renderTechChart(techData) {
+            const ctx = document.getElementById('techChart').getContext('2d');
+            const labels = Object.keys(techData);
+            const data = Object.values(techData);
+
+            if (labels.length === 0) {
+                labels.push("Нет данных");
+                data.push(0);
+            }
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Использований',
+                        data: data,
+                        backgroundColor: 'rgba(236, 72, 153, 0.7)', // Pink
+                        borderColor: 'rgba(236, 72, 153, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { stepSize: 1 }
+                        },
+                        x: { grid: { display: false } }
                     }
                 }
             });
         }
     </script>
+    <script src="/tranquility/static/js/v2.js?v=2" defer></script>
 </body>
 
 </html>

@@ -7,6 +7,103 @@
     <title>Мир спокойствия - Анкета</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/tranquility/static/css/style.css">
+    <link rel="stylesheet" href="/tranquility/static/css/v2.css?v=2">
+    <style>
+        .split-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media(max-width: 768px) {
+            .split-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .phase-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+        }
+
+        /* Beautiful Range Slider */
+        .slider-container {
+            margin-bottom: 25px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .stress-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            outline: none;
+            transition: background 0.3s;
+        }
+
+        .stress-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.1s;
+        }
+
+        .stress-slider::-webkit-slider-thumb:active {
+            transform: scale(1.2);
+        }
+
+        /* Tag Cloud for Physical Sensations */
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .sensation-tag {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .sensation-tag:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .sensation-tag.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+        }
+
+        .custom-sensation {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .custom-sensation.visible {
+            display: block;
+        }
+    </style>
 </head>
 
 <body class="page-questionnaire">
@@ -29,74 +126,181 @@
         </div>
     </nav>
 
-    <div class="container" style="max-width: 800px; margin-top: 3rem; margin-bottom: 3rem;">
+    <div class="container" style="max-width: 900px; margin-top: 3rem; margin-bottom: 3rem;">
         <div class="stress-tracker" style="text-align: left;">
-            <h2 style="margin-bottom: 20px;"><i class="fas fa-clipboard-list"></i> Рефлексия до и после</h2>
-            <p style="margin-bottom: 30px;">Сравните свои ощущения до начала практики и после её завершения.</p>
+            <h2 style="margin-bottom: 15px;"><i class="fas fa-clipboard-list"></i> Рефлексия практики</h2>
+            <p style="margin-bottom: 30px; color: var(--text-muted);">Отметьте свои ощущения до и после упражнения. Это
+                поможет алгоритму подобрать лучшие техники.</p>
 
             <form id="qForm">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="split-grid">
+
                     <!-- До практики -->
-                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;">
-                        <h3 style="margin-bottom: 15px; color: #a371f7;">ДО практики</h3>
-                        <div class="form-group">
-                            <label>Уровень напряжения (1-10):</label>
-                            <input type="number" id="stress-before" class="form-control" min="1" max="10" required>
+                    <div class="phase-card">
+                        <h3 style="margin-bottom: 20px; color: #a371f7;"><i class="fas fa-hourglass-start"></i> ДО
+                            практики</h3>
+
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <span>Уровень стресса:</span>
+                                <span id="val-before" style="color: #ef4444; font-size: 1.2rem;">5 / 10</span>
+                            </div>
+                            <input type="range" id="stress-before" class="stress-slider" min="1" max="10" value="5"
+                                oninput="updateSlider('before', this.value)">
                         </div>
+
                         <div class="form-group">
-                            <label>Физические ощущения:</label>
-                            <input type="text" id="body-before" class="form-control"
-                                placeholder="Комок в горле, напряжение в плечах..." required>
+                            <label style="margin-bottom: 15px; display: block;">Физические ощущения:</label>
+                            <div class="tag-cloud" id="tags-before">
+                                <div class="sensation-tag">Комок в горле</div>
+                                <div class="sensation-tag">Дрожь</div>
+                                <div class="sensation-tag">Стучит сердце</div>
+                                <div class="sensation-tag">Вялость</div>
+                                <div class="sensation-tag" data-custom="true">Свой вариант...</div>
+                            </div>
+                            <input type="text" id="body-before-custom" class="form-control custom-sensation"
+                                placeholder="Опишите свои ощущения...">
                         </div>
                     </div>
 
                     <!-- После практики -->
-                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;">
-                        <h3 style="margin-bottom: 15px; color: #56d364;">ПОСЛЕ практики</h3>
-                        <div class="form-group">
-                            <label>Уровень напряжения (1-10):</label>
-                            <input type="number" id="stress-after" class="form-control" min="1" max="10" required>
+                    <div class="phase-card">
+                        <h3 style="margin-bottom: 20px; color: #34d399;"><i class="fas fa-hourglass-end"></i> ПОСЛЕ
+                            практики</h3>
+
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <span>Уровень стресса:</span>
+                                <span id="val-after" style="color: #34d399; font-size: 1.2rem;">2 / 10</span>
+                            </div>
+                            <input type="range" id="stress-after" class="stress-slider" min="1" max="10" value="2"
+                                oninput="updateSlider('after', this.value)">
                         </div>
+
                         <div class="form-group">
-                            <label>Физические ощущения:</label>
-                            <input type="text" id="body-after" class="form-control"
-                                placeholder="Расслабленность, тепло..." required>
+                            <label style="margin-bottom: 15px; display: block;">Физические ощущения:</label>
+                            <div class="tag-cloud" id="tags-after">
+                                <div class="sensation-tag">Расслабленность</div>
+                                <div class="sensation-tag">Легкость</div>
+                                <div class="sensation-tag">Тепло</div>
+                                <div class="sensation-tag">Сонливость</div>
+                                <div class="sensation-tag" data-custom="true">Свой вариант...</div>
+                            </div>
+                            <input type="text" id="body-after-custom" class="form-control custom-sensation"
+                                placeholder="Опишите свои ощущения...">
                         </div>
                     </div>
                 </div>
 
-                <div class="form-group" style="margin-top: 20px;">
-                    <label>Какую технику вы использовали?</label>
+                <div class="form-group"
+                    style="margin-top: 30px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;">
+                    <label style="font-weight: bold; margin-bottom: 10px; display: block;">Которую технику вы
+                        использовали?</label>
                     <select id="technique" class="form-control" required
-                        style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
+                        style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); font-size: 1.1rem; padding: 15px;">
                         <option value="Дыхание 4-7-8" style="color: #000;">Дыхание 4-7-8</option>
                         <option value="Квадратное дыхание" style="color: #000;">Квадратное дыхание</option>
                         <option value="Медитация" style="color: #000;">Медитация звуков</option>
-                        <option value="Заземление" style="color: #000;">Заземление 5-4-3-2-1</option>
+                        <option value="Заземление 5-4-3-2-1" style="color: #000;">Заземление 5-4-3-2-1</option>
+                        <option value="Якорь" style="color: #000;">Якорь</option>
+                        <option value="Коробка переживаний" style="color: #000;">Сканер тела (Коробка переживаний)
+                        </option>
                     </select>
                 </div>
 
-                <button type="submit" class="btn btn-hero" style="width: 100%; margin-top: 20px;"><i
-                        class="fas fa-paper-plane"></i> Отправить анкету</button>
+                <button type="submit" class="btn btn-hero"
+                    style="width: 100%; margin-top: 10px; padding: 20px; font-size: 1.2rem;">
+                    <i class="fas fa-paper-plane"></i> Отправить отчет в статистику
+                </button>
             </form>
+
             <div id="qResult"
-                style="margin-top: 20px; font-weight: bold; color: var(--secondary-color); display: none;">Анкета
-                успешно сохранена в базе.</div>
+                style="margin-top: 20px; font-weight: bold; color: var(--secondary-color); display: none; text-align: center; padding: 15px; border-radius: 10px; background: rgba(16, 185, 129, 0.1);">
+                <i class="fas fa-check-circle"></i> Отлично! Ваша статистика обновлена.
+            </div>
         </div>
     </div>
 
     <script src="/tranquility/static/js/main.js"></script>
     <script>
+        // Color mapping for sliders (Green -> Yellow -> Red)
+        function getSliderColor(val) {
+            if (val <= 3) return '#34d399'; // Green
+            if (val <= 6) return '#facc15'; // Yellow
+            return '#ef4444'; // Red
+        }
+
+        function updateSlider(phase, value) {
+            const el = document.getElementById(`val-${phase}`);
+            const slider = document.getElementById(`stress-${phase}`);
+            const color = getSliderColor(value);
+
+            el.textContent = `${value} / 10`;
+            el.style.color = color;
+            slider.style.background = `linear-gradient(to right, ${color} ${value * 10}%, rgba(255,255,255,0.1) ${value * 10}%)`;
+        }
+
+        // Initialize sliders visually
+        updateSlider('before', 5);
+        updateSlider('after', 2);
+
+        // Tag Logic
+        function setupTags(phase) {
+            const container = document.getElementById(`tags-${phase}`);
+            const customInput = document.getElementById(`body-${phase}-custom`);
+            const tags = container.querySelectorAll('.sensation-tag');
+
+            tags.forEach(tag => {
+                tag.addEventListener('click', function () {
+                    const isCustom = this.getAttribute('data-custom') === 'true';
+
+                    // Toggle Active state
+                    this.classList.toggle('active');
+
+                    // If it was the custom button, toggle the text input visibility
+                    if (isCustom) {
+                        if (this.classList.contains('active')) {
+                            customInput.classList.add('visible');
+                            customInput.focus();
+                        } else {
+                            customInput.classList.remove('visible');
+                            customInput.value = '';
+                        }
+                    }
+                });
+            });
+        }
+
+        setupTags('before');
+        setupTags('after');
+
+        // Extract selected tags to string
+        function getSelectedSensations(phase) {
+            const container = document.getElementById(`tags-${phase}`);
+            const activeTags = container.querySelectorAll('.sensation-tag.active:not([data-custom="true"])');
+            let results = Array.from(activeTags).map(t => t.textContent);
+
+            const customBtn = container.querySelector('.sensation-tag[data-custom="true"]');
+            if (customBtn && customBtn.classList.contains('active')) {
+                const customVal = document.getElementById(`body-${phase}-custom`).value.trim();
+                if (customVal) results.push(customVal);
+            }
+
+            return results.length > 0 ? results.join(', ') : "Нет явных ощущений";
+        }
+
+        // Form Submission
         document.getElementById('qForm').addEventListener('submit', function (e) {
             e.preventDefault();
+
             const data = {
                 before: {
                     stress: document.getElementById('stress-before').value,
-                    body: document.getElementById('body-before').value
+                    body: getSelectedSensations('before')
                 },
                 after: {
                     stress: document.getElementById('stress-after').value,
-                    body: document.getElementById('body-after').value
+                    body: getSelectedSensations('after')
                 },
                 technique: document.getElementById('technique').value
             };
@@ -106,12 +310,26 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             }).then(() => {
-                document.getElementById('qResult').style.display = 'block';
-                this.reset();
-                setTimeout(() => { document.getElementById('qResult').style.display = 'none'; }, 3000);
-            });
+                const res = document.getElementById('qResult');
+                res.style.display = 'block';
+
+                // Reset form visual state naturally
+                document.querySelectorAll('.sensation-tag').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.custom-sensation').forEach(i => {
+                    i.classList.remove('visible');
+                    i.value = '';
+                });
+
+                updateSlider('before', 5);
+                document.getElementById('stress-before').value = 5;
+                updateSlider('after', 2);
+                document.getElementById('stress-after').value = 2;
+
+                setTimeout(() => { res.style.display = 'none'; }, 4000);
+            }).catch(err => console.error(err));
         });
     </script>
+    <script src="/tranquility/static/js/v2.js?v=2" defer></script>
 </body>
 
 </html>

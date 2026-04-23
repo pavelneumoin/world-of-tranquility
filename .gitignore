@@ -1,25 +1,35 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Virtual environments
+# Dependencies
+node_modules/
 venv/
-env/
-.venv/
+__pycache__/
+*.pyc
+*.pyo
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
+# Secrets
+.env
+.env.local
+*.key
+*.pem
 
-# OS
-.DS_Store
-Thumbs.db
+# Databases
+*.db
+*.sqlite
+*.sqlite3
 
 # Logs
 *.log
+gunicorn.log
+gunicorn.ctl
 
-# Local development
-.env
+# Editor
+.idea/
+.vscode/
+.DS_Store
+
+# OS
+Thumbs.db
+
+# Backups
+backups/
+*.bak
+*.old

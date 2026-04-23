@@ -7,6 +7,7 @@
     <title>Мир спокойствия - Экстренная помощь</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/tranquility/static/css/style.css">
+    <link rel="stylesheet" href="/tranquility/static/css/v2.css?v=2">
     <style>
         .emergency-banner {
             background: rgba(239, 68, 68, 0.1);
@@ -17,12 +18,29 @@
             margin-top: 3rem;
             margin-bottom: 3rem;
             box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+            position: relative;
+            z-index: 10;
         }
 
-        .emergency-banner .fas {
+        .emergency-banner .fas.fa-heartbeat {
             font-size: 4rem;
             color: #ef4444;
             margin-bottom: 20px;
+            animation: pulse-panic 1.5s infinite;
+        }
+
+        @keyframes pulse-panic {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         .emergency-banner h1 {
@@ -30,23 +48,150 @@
             margin-bottom: 15px;
         }
 
-        .contact-box {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
+        /* Tap to Call Buttons Grid */
+        .call-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-call {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 20px;
-            margin-top: 20px;
-            display: inline-block;
+            border-radius: 15px;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s ease;
             text-align: left;
         }
 
-        .contact-item {
-            margin-bottom: 15px;
-            font-size: 1.1rem;
+        .btn-call:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
         }
 
-        .contact-item i {
-            color: #60a5fa;
-            width: 30px;
+        .btn-call .icon-wrap {
+            background: #3b82f6;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .btn-call .call-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .btn-call .call-title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .btn-call .call-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* SOS Breathing Overlay */
+        .sos-btn {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.5);
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 400px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .sos-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(239, 68, 68, 0.6);
+        }
+
+        #sos-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        #sos-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .sos-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.8), rgba(16, 185, 129, 0.2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.5);
+            transition: all 4s ease-in-out;
+            text-align: center;
+        }
+
+        .sos-circle.inhale {
+            transform: scale(2);
+        }
+
+        .sos-circle.exhale {
+            transform: scale(1);
+        }
+
+        .close-sos {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .close-sos:hover {
+            opacity: 1;
         }
     </style>
 </head>
@@ -74,33 +219,107 @@
     <div class="container">
         <div class="emergency-banner">
             <i class="fas fa-heartbeat"></i>
-            <h1>Ты не один. Дыши.</h1>
-            <p style="font-size: 1.2rem; max-width: 600px; margin: 0 auto 30px; color: #fff;">Если вы чувствуете сильную
-                панику или вы не справляетесь, обратитесь за бесплатной и анонимной помощью.</p>
+            <h1>Ты не один(а). Прямо сейчас дыши.</h1>
+            <p style="font-size: 1.2rem; max-width: 600px; margin: 0 auto 30px; color: #fff;">
+                Если вы чувствуете сильную панику, не можете сделать вдох или вам кажется, что вы не справляетесь.
+            </p>
 
-            <a href="/tranquility/breathing" class="btn btn-hero"
-                style="background: linear-gradient(135deg, #ef4444, #f87171); box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4); margin-bottom: 30px;"><i
-                    class="fas fa-wind"></i> Перейти к Дыханию 4-7-8</a>
+            <!-- Giant SOS Button -->
+            <button class="sos-btn" onclick="startSOS()">
+                <i class="fas fa-compress-arrows-alt"></i> СВЕСТИ ПАНИКУ К МИНИМУМУ
+            </button>
 
-            <br>
+            <div style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px;">
+                <h3 style="color: #60a5fa;">Или обратитесь за бесплатной помощью к человеку:</h3>
 
-            <div class="contact-box">
-                <h3 style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
-                    Телефоны доверия:</h3>
-                <div class="contact-item">
-                    <i class="fas fa-phone"></i> <strong>Единый телефон доверия:</strong> 8-800-333-44-34
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-child"></i> <strong>Телефон доверия для детей и подростков:</strong> 8-800-2000-122
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-ambulance"></i> <strong>Скорая помощь:</strong> 103 или 112
+                <div class="call-grid">
+                    <a href="tel:88003334434" class="btn-call">
+                        <div class="icon-wrap"><i class="fas fa-phone-alt"></i></div>
+                        <div class="call-text">
+                            <span class="call-title">Единый телефон доверия</span>
+                            <span class="call-number">8-800-333-44-34</span>
+                        </div>
+                    </a>
+
+                    <a href="tel:88002000122" class="btn-call">
+                        <div class="icon-wrap" style="background: #10b981;"><i class="fas fa-child"></i></div>
+                        <div class="call-text">
+                            <span class="call-title">Для детей и подростков</span>
+                            <span class="call-number">8-800-2000-122</span>
+                        </div>
+                    </a>
+
+                    <a href="tel:112" class="btn-call" style="border-color: rgba(239, 68, 68, 0.4);">
+                        <div class="icon-wrap" style="background: #ef4444;"><i class="fas fa-ambulance"></i></div>
+                        <div class="call-text">
+                            <span class="call-title">Скорая помощь / МЧС</span>
+                            <span class="call-number" style="color: #fca5a5;">112</span>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- SOS Overlay Modal -->
+    <div id="sos-overlay">
+        <button class="close-sos" onclick="stopSOS()"><i class="fas fa-times"></i></button>
+        <div style="color: white; font-size: 1.5rem; margin-bottom: 60px; text-align: center; max-width: 600px;">
+            Смотрите на круг. Сделайте глубокий вдох, когда он расширяется. Медленный выдох, когда он сжимается.
+        </div>
+        <div class="sos-circle" id="sos-circle">
+            ВДОХ
+        </div>
+    </div>
+
     <script src="/tranquility/static/js/main.js"></script>
+    <script>
+        // SOS Breathing Logic
+        let sosInterval;
+        let isSOSActive = false;
+
+        const overlay = document.getElementById('sos-overlay');
+        const circle = document.getElementById('sos-circle');
+
+        function startSOS() {
+            isSOSActive = true;
+            overlay.classList.add('active');
+
+            // Start Breathing Cycle (4s Inhale, 4s Exhale)
+            circle.textContent = "ВДОХ";
+            circle.classList.add('inhale');
+
+            let phase = 'exhale';
+
+            sosInterval = setInterval(() => {
+                if (phase === 'exhale') {
+                    circle.textContent = "ВЫДОХ";
+                    circle.classList.remove('inhale');
+                    circle.classList.add('exhale');
+                    phase = 'inhale';
+                } else {
+                    circle.textContent = "ВДОХ";
+                    circle.classList.remove('exhale');
+                    circle.classList.add('inhale');
+                    phase = 'exhale';
+                }
+            }, 4000); // switch every 4 seconds
+        }
+
+        function stopSOS() {
+            isSOSActive = false;
+            overlay.classList.remove('active');
+            clearInterval(sosInterval);
+
+            // Reset circle state
+            setTimeout(() => {
+                circle.classList.remove('inhale');
+                circle.classList.remove('exhale');
+                circle.textContent = "ВДОХ";
+            }, 500);
+        }
+    </script>
+    <script src="/tranquility/static/js/v2.js?v=2" defer></script>
 </body>
 
 </html>

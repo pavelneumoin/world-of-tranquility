@@ -7,6 +7,7 @@
     <title>Мир спокойствия - Дыхание</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/tranquility/static/css/style.css">
+    <link rel="stylesheet" href="/tranquility/static/css/v2.css?v=2">
     <style>
         .breathing-container {
             display: flex;
@@ -107,6 +108,47 @@
         .btn-stop:hover {
             background: rgba(239, 68, 68, 0.2);
         }
+
+        /* Выбор техники */
+        .technique-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .technique-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .technique-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .technique-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .breathing-hold-out .breath-circle-inner {
+            transform: scale(1);
+            background: linear-gradient(135deg, #1e3a8a, #312e81);
+        }
+
+        .breathing-hold-out .breath-circle-outer {
+            box-shadow: 0 0 20px rgba(30, 58, 138, 0.5);
+            border-color: rgba(30, 58, 138, 0.4);
+        }
     </style>
 </head>
 
@@ -132,8 +174,16 @@
 
     <main class="container">
         <div class="breathing-container">
-            <h1 style="margin-bottom: 10px;">Дыхание 4-7-8</h1>
-            <p style="color: var(--text-muted); margin-bottom: 40px; text-align: center; max-width: 600px;">
+            <h1 id="bHeading" style="margin-bottom: 10px;">Дыхание 4-7-8</h1>
+
+            <div class="technique-selector">
+                <button class="technique-btn active" onclick="selectTechnique('4-7-8')">4-7-8</button>
+                <button class="technique-btn" onclick="selectTechnique('box')">Квадратное</button>
+                <button class="technique-btn" onclick="selectTechnique('resonant')">Равномерное</button>
+                <button class="technique-btn" onclick="selectTechnique('4-2-4')">Очищающее</button>
+            </div>
+
+            <p id="bDesc" style="color: var(--text-muted); margin-bottom: 40px; text-align: center; max-width: 600px;">
                 Глубокое диафрагмальное дыхание для мгновенного снятия стресса и переключения нервной системы в режим
                 отдыха.
             </p>
@@ -160,12 +210,99 @@
         let isBreathing = false;
         let timeoutIds = [];
         let cycleId = null;
+        let currentTechnique = '4-7-8';
 
         const wrapper = document.getElementById('breathWrapper');
         const text = document.getElementById('breathText');
         const innerCircle = document.getElementById('innerCircle');
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
+        const uiHeading = document.getElementById('bHeading');
+        const uiDesc = document.getElementById('bDesc');
+
+        const techniques = {
+            '4-7-8': {
+                name: 'Дыхание 4-7-8',
+                desc: 'Глубокое диафрагмальное дыхание для мгновенного снятия стресса и переключения нервной системы в режим отдыха.',
+                cycleTime: 19000,
+                phases: [
+                    { name: 'Вдох... (4)', class: 'breathing-inhale', duration: 4000, transition: '4s' },
+                    { name: 'Задержка... (7)', class: 'breathing-hold', duration: 7000, transition: '0s' },
+                    { name: 'Медленный выдох... (8)', class: 'breathing-exhale', duration: 8000, transition: '8s' }
+                ]
+            },
+            'box': {
+                name: 'Квадратное дыхание',
+                desc: 'Равные интервалы (4 сек) для концентрации, баланса и снятия тревоги. Идеально перед сложным заданием.',
+                cycleTime: 16000,
+                phases: [
+                    { name: 'Вдох... (4)', class: 'breathing-inhale', duration: 4000, transition: '4s' },
+                    { name: 'Задержка... (4)', class: 'breathing-hold', duration: 4000, transition: '0s' },
+                    { name: 'Выдох... (4)', class: 'breathing-exhale', duration: 4000, transition: '4s' },
+                    { name: 'Задержка... (4)', class: 'breathing-hold-out', duration: 4000, transition: '0s' }
+                ]
+            },
+            'resonant': {
+                name: 'Равномерное дыхание',
+                desc: 'Плавные циклы по 5 секунд (6 вдохов в минуту). Синхронизирует сердечный ритм и успокаивает ум.',
+                cycleTime: 10000,
+                phases: [
+                    { name: 'Плавный вдох... (5)', class: 'breathing-inhale', duration: 5000, transition: '5s' },
+                    { name: 'Плавный выдох... (5)', class: 'breathing-exhale', duration: 5000, transition: '5s' }
+                ]
+            },
+            '4-2-4': {
+                name: 'Очищающее дыхание',
+                desc: 'Короткая пауза на высоте вдоха. Помогает сбросить напряжение мышц грудной клетки.',
+                cycleTime: 10000,
+                phases: [
+                    { name: 'Вдох... (4)', class: 'breathing-inhale', duration: 4000, transition: '4s' },
+                    { name: 'Пауза... (2)', class: 'breathing-hold', duration: 2000, transition: '0s' },
+                    { name: 'Выдох... (4)', class: 'breathing-exhale', duration: 4000, transition: '4s' }
+                ]
+            }
+        };
+
+        function selectTechnique(id) {
+            if (isBreathing) stopExercise();
+
+            currentTechnique = id;
+            const tech = techniques[id];
+            uiHeading.textContent = tech.name;
+            uiDesc.textContent = tech.desc;
+
+            // Обновляем UI кнопок
+            document.querySelectorAll('.technique-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(tech.name) ||
+                    (id === '4-7-8' && btn.textContent === '4-7-8') ||
+                    (id === 'box' && btn.textContent === 'Квадратное') ||
+                    (id === 'resonant' && btn.textContent === 'Равномерное') ||
+                    (id === '4-2-4' && btn.textContent === 'Очищающее')) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function runCycle() {
+            if (!isBreathing) return;
+            const tech = techniques[currentTechnique];
+            let accumulatedTime = 0;
+
+            tech.phases.forEach((phase, index) => {
+                let t = setTimeout(() => {
+                    if (!isBreathing) return;
+                    wrapper.className = `breath-circle-wrapper ${phase.class}`;
+                    if (phase.transition !== '0s') {
+                        innerCircle.style.transition = `all ${phase.transition} ease-in-out`;
+                    }
+                    text.textContent = phase.name;
+                }, accumulatedTime);
+
+                accumulatedTime += phase.duration;
+                timeoutIds.push(t);
+            });
+        }
 
         function startExercise() {
             if (isBreathing) return;
@@ -174,16 +311,14 @@
             startBtn.style.display = 'none';
             stopBtn.style.display = 'inline-block';
 
-            // Начать первый цикл
+            const tech = techniques[currentTechnique];
             runCycle();
-            // Повторять цикл длительностью 19 секунд (4 + 7 + 8)
-            cycleId = setInterval(runCycle, 19000);
+            cycleId = setInterval(runCycle, tech.cycleTime);
 
-            // Log session start
             fetch('/tranquility/api/start-breathing', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ technique: '4-7-8', startTime: new Date().toISOString() })
+                body: JSON.stringify({ technique: currentTechnique, startTime: new Date().toISOString() })
             }).catch(e => console.log(e));
         }
 
@@ -193,7 +328,6 @@
             timeoutIds.forEach(clearTimeout);
             timeoutIds = [];
 
-            // Reset styles
             wrapper.className = 'breath-circle-wrapper';
             innerCircle.style.transition = 'all 1s ease';
             text.textContent = 'Остановлено';
@@ -202,31 +336,8 @@
             stopBtn.style.display = 'none';
             startBtn.innerHTML = '<i class="fas fa-redo"></i> Начать заново';
         }
-
-        function runCycle() {
-            // ВДОХ (4 сек)
-            wrapper.className = 'breath-circle-wrapper breathing-inhale';
-            innerCircle.style.transition = 'all 4s ease-in-out';
-            text.textContent = 'Глубокий вдох... (4)';
-
-            let t1 = setTimeout(() => {
-                if (!isBreathing) return;
-                // ЗАДЕРЖКА (7 сек)
-                wrapper.className = 'breath-circle-wrapper breathing-hold';
-                text.textContent = 'Задержка... (7)';
-            }, 4000);
-
-            let t2 = setTimeout(() => {
-                if (!isBreathing) return;
-                // ВЫДОХ (8 сек)
-                wrapper.className = 'breath-circle-wrapper breathing-exhale';
-                innerCircle.style.transition = 'all 8s ease-in-out';
-                text.textContent = 'Медленный выдох... (8)';
-            }, 11000); // 4 + 7
-
-            timeoutIds.push(t1, t2);
-        }
     </script>
+    <script src="/tranquility/static/js/v2.js?v=2" defer></script>
 </body>
 
 </html>

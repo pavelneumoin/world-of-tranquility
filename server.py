@@ -1,352 +1,292 @@
 """
-Мир спокойствия - HTTP сервер
-Реструктурированная версия с отдельными шаблонами, статическими файлами и SQLite БД (Glassmorphism Zen)
+Мир спокойствия v3 — Python stdlib HTTP server + GigaChat интеграция для Милы.
+Раздаёт SPA + JSX + manifest + проксирует /api/mila-chat в GigaChat.
 """
-
-import socket
-import threading
+import os
 import json
 import time
-import os
-import sqlite3
-from datetime import datetime
-from urllib.parse import urlparse, parse_qs
+import uuid
+import socket
+import threading
+import ssl
+import urllib.request
+import urllib.parse
+import urllib.error
+from urllib.parse import urlparse, unquote
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-class SimpleHTTPServer:
-    """Простой HTTP сервер для сайта управления стрессом (SQLite)"""
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+V2_DIR = os.path.join(BASE_DIR, 'v2')
 
-    def __init__(self, host='localhost', port=5000):
-        self.host = host
-        self.port = port
-        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.running = False
-        
-        # Пути к файлам
-        self.base_dir = os.path.dirname(os.path.abspath(__file__))
-        self.templates_dir = os.path.join(self.base_dir, 'templates')
-        self.static_dir = os.path.join(self.base_dir, 'static')
-        self.db_path = os.path.join(self.base_dir, 'data.db')
-        
-        self.init_db()
+# === GigaChat ===
+GIGACHAT_KEY = os.environ.get(
+    'GIGACHAT_AUTH_KEY',
+    'MDE5Yjg3ZGQtYmQ2My03ZTYwLTk1ZmUtYjk4ZmZiYTVjMmI3Ojc2YWRkY2E5LTU1OWQtNGJjNS04Mzk4LTg2ZWVhZTc1MWVhYQ=='
+)
+GIGACHAT_SCOPE = os.environ.get('GIGACHAT_SCOPE', 'GIGACHAT_API_PERS')
+_gc_token = {'access_token': None, 'expires_at': 0}
+_gc_lock = threading.Lock()
 
-    def get_db_connection(self):
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
-        return conn
+MILA_SYSTEM_PROMPT = (
+    "Ты — Мила, волшебная кошка-сказочница из детского приложения «Мир спокойствия». "
+    "Твоя аудитория — дети 6–12 лет. Всегда обращайся на «ты», по-доброму, тепло, как старший друг. "
+    "Твоя задача — помочь ребёнку справиться со страхом, тревогой, грустью, обидой или гневом. "
+    "Если ребёнок грустит — поддержи. Если попросил сказку — рассказывай короткую (3–6 фраз), добрую, без злодеев и страшных сцен. "
+    "Используй мягкие образы: облачко, звёзды, светлячки, лесные звери. Обязательно вставляй символ ✦ иногда. "
+    "Не давай медицинских советов. Если ребёнок говорит об угрозе жизни, боли или насилии — мягко скажи «мне важно, что ты мне рассказал, пожалуйста, обязательно позови взрослого или позвони 8-800-2000-122 — это бесплатно». "
+    "Отвечай кратко (2–5 предложений), простым языком. Можно добавлять 1–2 эмодзи уместно."
+)
 
-    def init_db(self):
-        """Инициализация SQLite базы данных"""
-        conn = self.get_db_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS stress_logs (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                level INTEGER NOT NULL,
-                timestamp TEXT NOT NULL
-            )
-        ''')
-        
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS journal_entries (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                text TEXT NOT NULL,
-                mood TEXT NOT NULL,
-                timestamp TEXT NOT NULL
-            )
-        ''')
-        
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS questionnaires (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                data_json TEXT NOT NULL,
-                timestamp TEXT NOT NULL
-            )
-        ''')
-        
-        conn.commit()
-        conn.close()
 
-    def start(self):
-        """Запуск сервера"""
+def get_gigachat_token():
+    """Получаем и кешируем access_token GigaChat."""
+    now = time.time()
+    with _gc_lock:
+        if _gc_token['access_token'] and _gc_token['expires_at'] > now + 60:
+            return _gc_token['access_token']
+        data = urllib.parse.urlencode({'scope': GIGACHAT_SCOPE}).encode('utf-8')
+        req = urllib.request.Request(
+            'https://ngw.devices.sberbank.ru:9443/api/v2/oauth',
+            data=data,
+            method='POST'
+        )
+        req.add_header('Authorization', f'Basic {GIGACHAT_KEY}')
+        req.add_header('RqUID', str(uuid.uuid4()))
+        req.add_header('Content-Type', 'application/x-www-form-urlencoded')
+        req.add_header('Accept', 'application/json')
+        # GigaChat использует самоподписанный сертификат — разрешаем
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
         try:
-            self.server_socket.bind((self.host, self.port))
-            self.server_socket.listen(5)
-            self.running = True
-
-            print(f"Сервер запущен на http://{self.host}:{self.port}")
-            print("База данных SQLite подключена (data.db)")
-
-            while self.running:
-                try:
-                    client_socket, addr = self.server_socket.accept()
-                    client_thread = threading.Thread(
-                        target=self.handle_client,
-                        args=(client_socket, addr)
-                    )
-                    client_thread.daemon = True
-                    client_thread.start()
-                except OSError:
-                    break
-        except OSError as e:
-            if e.errno == 48 or e.errno == 10048:
-                print(f"Порт {self.port} уже занят!")
-                return False
-            else:
-                raise
-        return True
-
-    def stop(self):
-        """Остановка сервера"""
-        self.running = False
-        self.server_socket.close()
-        print("Сервер остановлен")
-
-    def handle_client(self, client_socket, addr):
-        """Обработка клиентского соединения"""
-        try:
-            request_data = client_socket.recv(4096).decode('utf-8')
-            if not request_data:
-                return
-
-            request_lines = request_data.split('\n')
-            if not request_lines:
-                return
-
-            first_line = request_lines[0]
-            parts = first_line.split(' ')
-            if len(parts) < 2:
-                return
-                
-            method, path = parts[0], parts[1]
-            response = self.route_request(method, path, request_data)
-            client_socket.sendall(response)
-
+            with urllib.request.urlopen(req, context=ctx, timeout=15) as resp:
+                body = json.loads(resp.read().decode('utf-8'))
+                _gc_token['access_token'] = body.get('access_token')
+                expires_at_ms = body.get('expires_at', 0)
+                _gc_token['expires_at'] = expires_at_ms / 1000.0 if expires_at_ms > 10**12 else (now + 1500)
+                return _gc_token['access_token']
+        except urllib.error.HTTPError as e:
+            print(f"[GIGACHAT AUTH] HTTPError {e.code}: {e.read().decode('utf-8', 'ignore')[:300]}", flush=True)
         except Exception as e:
-            print(f"Ошибка обработки запроса: {e}")
-        finally:
-            client_socket.close()
+            print(f"[GIGACHAT AUTH] {type(e).__name__}: {e}", flush=True)
+    return None
 
-    def route_request(self, method, path, request_data):
-        """Маршрутизация запросов"""
-        parsed_path = urlparse(path)
-        path = parsed_path.path
 
-        # Strip /tranquility prefix for Nginx proxy
-        if path.startswith('/tranquility'):
-            path = path[len('/tranquility'):]
-            if path == '':
-                path = '/'
+def chat_gigachat(messages):
+    """Отправляем messages в GigaChat и возвращаем ответ."""
+    token = get_gigachat_token()
+    if not token:
+        return None
+    payload = json.dumps({
+        "model": "GigaChat",
+        "messages": messages,
+        "temperature": 0.75,
+        "max_tokens": 400,
+        "stream": False,
+    }, ensure_ascii=False).encode('utf-8')
+    req = urllib.request.Request(
+        'https://gigachat.devices.sberbank.ru/api/v1/chat/completions',
+        data=payload,
+        method='POST'
+    )
+    req.add_header('Authorization', f'Bearer {token}')
+    req.add_header('Content-Type', 'application/json')
+    req.add_header('Accept', 'application/json')
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    try:
+        with urllib.request.urlopen(req, context=ctx, timeout=25) as resp:
+            body = json.loads(resp.read().decode('utf-8'))
+            ch = body.get('choices') or []
+            if ch:
+                return ch[0].get('message', {}).get('content')
+    except urllib.error.HTTPError as e:
+        print(f"[GIGACHAT CHAT] HTTP {e.code}: {e.read().decode('utf-8','ignore')[:300]}", flush=True)
+    except Exception as e:
+        print(f"[GIGACHAT CHAT] {type(e).__name__}: {e}", flush=True)
+    return None
 
-        # API endpoints
-        if method == 'GET':
-            if path == '/api/stats':
-                return self.json_response(self.get_stats())
-            elif path == '/api/techniques':
-                return self.json_response(self.get_techniques())
 
-        # POST запросы
-        if method == 'POST':
-            if path == '/api/log-stress':
-                return self.handle_stress_log(request_data)
-            elif path == '/api/start-breathing':
-                return self.json_response({"status": "success", "message": "Дыхательное упражнение начато"})
-            elif path == '/api/submit-feedback':
-                return self.handle_feedback_submission(request_data)
-            elif path == '/api/submit-journal':
-                return self.handle_journal_submission(request_data)
+# === Static server ===
+SPA_ROUTES = {
+    '', '/', '/breathing', '/techniques', '/statistics', '/questionnaire',
+    '/journal', '/media', '/emergency', '/mila', '/parcels',
+    '/parcel-open', '/parcels-send', '/map', '/sos', '/parent', '/home'
+}
+MIME = {
+    '.html': 'text/html; charset=utf-8',
+    '.jsx':  'text/babel; charset=utf-8',
+    '.js':   'application/javascript; charset=utf-8',
+    '.css':  'text/css; charset=utf-8',
+    '.json': 'application/json; charset=utf-8',
+    '.svg':  'image/svg+xml',
+    '.png':  'image/png',
+    '.jpg':  'image/jpeg',
+    '.webp': 'image/webp',
+    '.ico':  'image/x-icon',
+    '.woff2':'font/woff2', '.woff':'font/woff', '.ttf':'font/ttf',
+    '.mp3':  'audio/mpeg', '.wav':'audio/wav', '.m4a':'audio/mp4', '.mp4':'video/mp4',
+}
 
-        # Статические файлы
-        if method == 'GET' and path.startswith('/static/'):
-            return self.serve_static(path)
 
-        # HTML страницы
-        if method == 'GET':
-            page_map = {
-                '/': 'index.html',
-                '/breathing': 'breathing.html',
-                '/techniques': 'techniques.html',
-                '/statistics': 'statistics.html',
-                '/questionnaire': 'questionnaire.html',
-                '/journal': 'journal.html',
-                '/media': 'media.html',
-                '/emergency': 'emergency.html',
-            }
-            
-            if path in page_map:
-                return self.serve_template(page_map[path])
-            elif path == '/favicon.ico':
-                return self.favicon_response()
+def guess_mime(path):
+    return MIME.get(os.path.splitext(path)[1].lower(), 'application/octet-stream')
 
-        return self.error_response(404, "Страница не найдена")
 
-    def serve_template(self, template_name):
-        """Загрузка HTML шаблона из файла"""
+def strip_prefix(path):
+    if path.startswith('/tranquility'):
+        path = path[len('/tranquility'):]
+    return path or '/'
+
+
+_index_bytes = [None, 0, None]
+
+
+def read_index():
+    path = os.path.join(V2_DIR, 'index.html')
+    try:
+        mt = os.path.getmtime(path)
+        if _index_bytes[0] is None or mt != _index_bytes[1]:
+            with open(path, 'rb') as f:
+                _index_bytes[0] = f.read()
+            _index_bytes[1] = mt
+    except Exception:
+        return b'<h1>index.html not found</h1>'
+    return _index_bytes[0]
+
+
+class Handler(BaseHTTPRequestHandler):
+    server_version = 'tranquility-v3/1.0'
+    protocol_version = 'HTTP/1.1'
+
+    def log_message(self, format, *args):
+        print(f"[{self.address_string()}] {format % args}", flush=True)
+
+    def _send_bytes(self, data, mime, status=200, cache=False):
+        self.send_response(status)
+        self.send_header('Content-Type', mime)
+        self.send_header('Content-Length', str(len(data)))
+        self.send_header('Cache-Control', 'public, max-age=3600' if cache else 'no-cache')
+        self.send_header('X-Content-Type-Options', 'nosniff')
+        self.end_headers()
+        self.wfile.write(data)
+
+    def _send_json(self, obj, status=200):
+        data = json.dumps(obj, ensure_ascii=False).encode('utf-8')
+        self._send_bytes(data, 'application/json; charset=utf-8', status)
+
+    def _send_file(self, rel):
+        full = os.path.join(V2_DIR, rel)
+        if not os.path.isfile(full):
+            return self._send_404()
+        if not os.path.abspath(full).startswith(os.path.abspath(V2_DIR)):
+            return self._send_404()
         try:
-            template_path = os.path.join(self.templates_dir, template_name)
-            with open(template_path, 'r', encoding='utf-8') as f:
-                html = f.read()
-            return self.html_response(html)
-        except FileNotFoundError:
-            return self.error_response(404, f"Шаблон {template_name} не найден")
-
-    def serve_static(self, path):
-        """Раздача статических файлов"""
-        try:
-            file_path = path[8:]  # strip /static/
-            full_path = os.path.join(self.static_dir, file_path.replace('/', os.sep))
-            
-            with open(full_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-            
-            if path.endswith('.css'): content_type = 'text/css'
-            elif path.endswith('.js'): content_type = 'application/javascript'
-            else: content_type = 'text/plain'
-            
-            return self.static_response(content, content_type)
+            with open(full, 'rb') as f:
+                data = f.read()
+            self._send_bytes(data, guess_mime(rel), cache=True)
         except Exception:
-            return self.error_response(404, "Файл не найден")
+            self._send_404()
 
-    def html_response(self, html):
-        body = html.encode('utf-8')
-        headers = ["HTTP/1.1 200 OK", "Content-Type: text/html; charset=utf-8", f"Content-Length: {len(body)}", "Connection: close", "", ""]
-        return "\r\n".join(headers).encode('utf-8') + body
+    def _send_index(self):
+        self._send_bytes(read_index(), 'text/html; charset=utf-8')
 
-    def json_response(self, data):
-        json_data = json.dumps(data, ensure_ascii=False, indent=2)
-        body = json_data.encode('utf-8')
-        headers = ["HTTP/1.1 200 OK", "Content-Type: application/json; charset=utf-8", "Access-Control-Allow-Origin: *", f"Content-Length: {len(body)}", "Connection: close", "", ""]
-        return "\r\n".join(headers).encode('utf-8') + body
+    def _send_404(self):
+        self._send_bytes(b'<h1>404</h1>', 'text/html; charset=utf-8', 404)
 
-    def static_response(self, content, content_type):
-        body = content.encode('utf-8')
-        headers = ["HTTP/1.1 200 OK", f"Content-Type: {content_type}; charset=utf-8", f"Content-Length: {len(body)}", "Connection: close", "", ""]
-        return "\r\n".join(headers).encode('utf-8') + body
-
-    def favicon_response(self):
-        return "\r\n".join(["HTTP/1.1 204 No Content", "Connection: close", "", ""]).encode('utf-8')
-
-    def error_response(self, code, message):
-        html = f"<html><body><h1>Ошибка {code}</h1><p>{message}</p></body></html>"
-        body = html.encode('utf-8')
-        headers = [f"HTTP/1.1 {code} Error", "Content-Type: text/html; charset=utf-8", f"Content-Length: {len(body)}", "Connection: close", "", ""]
-        return "\r\n".join(headers).encode('utf-8') + body
-
-    def parse_body(self, request_data):
-        lines = request_data.split('\\n')
-        body_start = False
-        body = ""
-        for line in lines:
-            if line.strip() == '':
-                body_start = True
-                continue
-            if body_start:
-                body += line
-        return body
-
-    def handle_stress_log(self, request_data):
+    def do_HEAD(self):
         try:
-            body = self.parse_body(request_data)
-            data = json.loads(body) if body else {}
-            level = int(data.get('level', 0))
-            ts = datetime.now().isoformat()
-            
-            conn = self.get_db_connection()
-            conn.execute('INSERT INTO stress_logs (level, timestamp) VALUES (?, ?)', (level, ts))
-            conn.commit()
-            conn.close()
+            self.do_GET()
+        except Exception:
+            pass
 
-            print(f"Получен уровень стресса: {level}")
-            return self.json_response({"status": "success", "message": "Уровень стресса записан", "level": level})
-        except Exception as e:
-            return self.json_response({"status": "error", "message": str(e)})
-
-    def handle_feedback_submission(self, request_data):
+    def do_GET(self):
         try:
-            body = self.parse_body(request_data)
-            data_json = body if body else "{}"
-            ts = datetime.now().isoformat()
-            
-            conn = self.get_db_connection()
-            conn.execute('INSERT INTO questionnaires (data_json, timestamp) VALUES (?, ?)', (data_json, ts))
-            conn.commit()
-            conn.close()
-            
-            print(f"Получена анкета")
-            return self.json_response({"status": "success", "message": "Анкета успешно отправлена!"})
-        except Exception as e:
-            return self.json_response({"status": "error", "message": str(e)})
+            parsed = urlparse(self.path)
+            path = strip_prefix(unquote(parsed.path))
 
-    def handle_journal_submission(self, request_data):
+            if path in ('/api/stats', '/api/stats/'):
+                return self._send_json({'status': 'success', 'data': {'server': 'tranquility-v3'}})
+
+            if path in ('/api/gigachat-status', '/api/gigachat-status/'):
+                token = get_gigachat_token()
+                return self._send_json({'status': 'ok' if token else 'error'})
+
+            clean = path.rstrip('/') or '/'
+            if clean in SPA_ROUTES or path in ('/', ''):
+                return self._send_index()
+
+            rel = path.lstrip('/')
+            if os.path.isfile(os.path.join(V2_DIR, rel)):
+                return self._send_file(rel)
+            return self._send_index()
+        except Exception as e:
+            print(f"[GET ERR] {e}", flush=True)
+            try: self._send_404()
+            except: pass
+
+    def do_POST(self):
         try:
-            body = self.parse_body(request_data)
-            data = json.loads(body) if body else {}
-            text = data.get("text", "")
-            mood = data.get("mood", "neutral")
-            ts = datetime.now().isoformat()
-            
-            conn = self.get_db_connection()
-            conn.execute('INSERT INTO journal_entries (text, mood, timestamp) VALUES (?, ?, ?)', (text, mood, ts))
-            conn.commit()
-            conn.close()
+            parsed = urlparse(self.path)
+            path = strip_prefix(unquote(parsed.path))
+            length = int(self.headers.get('Content-Length') or 0)
+            raw = self.rfile.read(length) if length > 0 else b''
 
-            print(f"Получена запись в журнал")
-            return self.json_response({"status": "success", "message": "Запись сохранена"})
+            if path in ('/api/mila-chat', '/api/mila-chat/'):
+                try:
+                    data = json.loads(raw.decode('utf-8')) if raw else {}
+                except Exception:
+                    return self._send_json({'error': 'bad json'}, 400)
+                user_msg = (data.get('message') or '').strip()
+                history = data.get('history') or []  # [{role,content}]
+                if not user_msg:
+                    return self._send_json({'error': 'empty'}, 400)
+
+                messages = [{'role': 'system', 'content': MILA_SYSTEM_PROMPT}]
+                # Включаем последние 6 реплик
+                for m in history[-6:]:
+                    if m.get('role') in ('user','assistant') and m.get('content'):
+                        messages.append({'role': m['role'], 'content': m['content']})
+                messages.append({'role':'user', 'content': user_msg})
+
+                answer = chat_gigachat(messages)
+                if answer:
+                    return self._send_json({'answer': answer, 'source': 'gigachat'})
+                return self._send_json({
+                    'answer': 'Муррр ✦ Сейчас я немного устала, но я рядом. Расскажи, что случилось?',
+                    'source': 'fallback'
+                })
+
+            if path in ('/api/log-stress', '/api/submit-journal',
+                        '/api/submit-feedback', '/api/start-breathing'):
+                return self._send_json({'status': 'success'})
+
+            return self._send_404()
         except Exception as e:
-            return self.json_response({"status": "error", "message": str(e)})
+            print(f"[POST ERR] {e}", flush=True)
+            try: self._send_404()
+            except: pass
 
-    def get_stats(self):
-        conn = self.get_db_connection()
-        c_logs = conn.execute('SELECT COUNT(*) FROM stress_logs').fetchone()[0]
-        c_journal = conn.execute('SELECT COUNT(*) FROM journal_entries').fetchone()[0]
-        c_quest = conn.execute('SELECT COUNT(*) FROM questionnaires').fetchone()[0]
-        
-        # Get raw logs for Chart.js
-        logs = conn.execute('SELECT level, timestamp FROM stress_logs ORDER BY timestamp ASC').fetchall()
-        logs_list = [{"level": r['level'], "timestamp": r['timestamp']} for r in logs]
-        
-        conn.close()
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
 
-        return {
-            "status": "success",
-            "data": {
-                "server": "Мир спокойствия",
-                "version": "3.0.0 (SQLite Edition)",
-                "timestamp": datetime.now().isoformat(),
-                "questionnaires_count": c_quest,
-                "journal_entries_count": c_journal,
-                "stress_logs_count": c_logs,
-                "stress_logs_data": logs_list
-            }
-        }
-
-    def get_techniques(self):
-        """Получение списка техник"""
-        return {
-            "breathing_techniques": [
-                {"id": 1, "name": "4-7-8", "description": "Вдох 4с, задержка 7с, выдох 8с"},
-                {"id": 2, "name": "Квадратное", "description": "4-4-4-4"},
-                {"id": 3, "name": "Диафрагмальное", "description": "Дыхание животом"}
-            ]
-        }
 
 def main():
-    print("=" * 50)
-    print("МИР СПОКОЙСТВИЯ v3.0 (SQLite)")
-    print("=" * 50)
     port = int(os.environ.get('PORT', 5001))
-    host = '0.0.0.0' if os.environ.get('RENDER') else '127.0.0.1'
-    server = SimpleHTTPServer(host=host, port=port)
-    
-    if server.start():
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            server.stop()
-    else:
-        print(f"Не удалось запустить сервер на порту {port}")
+    host = '127.0.0.1'
+    read_index()
+    print(f"Мир спокойствия v3 на http://{host}:{port}")
+    print(f"Статика: {V2_DIR}")
+    print(f"GigaChat: {'KEY OK' if GIGACHAT_KEY else 'NO KEY'}")
+    srv = ThreadingHTTPServer((host, port), Handler)
+    try: srv.serve_forever()
+    except KeyboardInterrupt: srv.shutdown()
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     main()

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Мир спокойствия — детская версия · вайрфреймы</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Caveat:wght@500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sketch-hand: 'Patrick Hand', 'Gloria Hallelujah', 'Caveat', sans-serif;
+  }
+  html, body { margin: 0; padding: 0; background: #f6f1e7; font-family: var(--sketch-hand); color: #1a1a1a; }
+  * { box-sizing: border-box; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="sketch-primitives.jsx"></script>
+<script type="text/babel" src="context-card.jsx"></script>
+<script type="text/babel" src="dir-a-star-map.jsx"></script>
+<script type="text/babel" src="dir-b-journal.jsx"></script>
+<script type="text/babel" src="dir-c-mail.jsx"></script>
+
+<script type="text/babel">
+const { useState } = React;
+
+function App() {
+  return (
+    <DesignCanvas title="Мир спокойствия — детская версия" subtitle="3 направления · низкополигональные вайрфреймы">
+      <DCSection id="intro" title="Контекст и система">
+        <DCArtboard id="ctx" label="обзор проекта" width={780} height={440}>
+          <div style={{ padding: 30 }}><ContextCard /></div>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="dirA" title="Направление A · Звёздная карта мира">
+        <DCArtboard id="a-home"    label="Главная · карта"       width={420} height={720}><div style={{padding:20}}><DirA_Home/></div></DCArtboard>
+        <DCArtboard id="a-journal" label="Журнал настроения"     width={420} height={720}><div style={{padding:20}}><DirA_Journal/></div></DCArtboard>
+        <DCArtboard id="a-cat"     label="Чат с Милой (GigaChat)" width={420} height={720}><div style={{padding:20}}><DirA_Cat/></div></DCArtboard>
+        <DCArtboard id="a-parcel"  label="Посылки спокойствия"   width={420} height={720}><div style={{padding:20}}><DirA_Parcel/></div></DCArtboard>
+        <DCArtboard id="a-sos"     label="SOS «Мне страшно»"     width={420} height={720}><div style={{padding:20}}><DirA_SOS/></div></DCArtboard>
+        <DCArtboard id="a-parent"  label="Родительский режим"    width={420} height={720}><div style={{padding:20}}><DirA_Parent/></div></DCArtboard>
+      </DCSection>
+
+      <DCSection id="dirB" title="Направление B · Уютный дневник">
+        <DCArtboard id="b-home"    label="Главная · дневник"    width={420} height={720}><div style={{padding:20}}><DirB_Home/></div></DCArtboard>
+        <DCArtboard id="b-journal" label="Журнал (погода+тело)" width={420} height={720}><div style={{padding:20}}><DirB_Journal/></div></DCArtboard>
+        <DCArtboard id="b-cat"     label="Сказочница у костра"  width={420} height={720}><div style={{padding:20}}><DirB_Cat/></div></DCArtboard>
+        <DCArtboard id="b-tech"    label="Техники релаксации"   width={420} height={720}><div style={{padding:20}}><DirB_Techniques/></div></DCArtboard>
+        <DCArtboard id="b-breath"  label="Дыхание облачка"      width={420} height={720}><div style={{padding:20}}><DirB_Breathing/></div></DCArtboard>
+      </DCSection>
+
+      <DCSection id="dirC" title="Направление C · Почта спокойствия">
+        <DCArtboard id="c-home"   label="Домик · почта"       width={420} height={720}><div style={{padding:20}}><DirC_Home/></div></DCArtboard>
+        <DCArtboard id="c-send"   label="Отправить посылку"   width={420} height={720}><div style={{padding:20}}><DirC_SendParcel/></div></DCArtboard>
+        <DCArtboard id="c-inbox"  label="Открыть посылку"     width={420} height={720}><div style={{padding:20}}><DirC_Inbox/></div></DCArtboard>
+        <DCArtboard id="c-cat"    label="Библиотека Милы"     width={420} height={720}><div style={{padding:20}}><DirC_Cat/></div></DCArtboard>
+        <DCArtboard id="c-progress" label="Прогресс-карта"    width={420} height={720}><div style={{padding:20}}><DirC_Progress/></div></DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

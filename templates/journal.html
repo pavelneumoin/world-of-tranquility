@@ -7,6 +7,107 @@
     <title>Мир спокойствия - Дневник</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/tranquility/static/css/style.css">
+    <link rel="stylesheet" href="/tranquility/static/css/v2.css?v=2">
+    <style>
+        .mood-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .mood-btn {
+            flex: 1;
+            min-width: 100px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mood-btn i {
+            font-size: 2rem;
+            transition: transform 0.3s;
+        }
+
+        .mood-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Selected States */
+        .mood-btn.selected[data-mood="Спокойствие"] {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .mood-btn.selected[data-mood="Радость"] {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+
+        .mood-btn.selected[data-mood="Тревога"] {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .mood-btn.selected[data-mood="Грусть"] {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .mood-btn.selected[data-mood="Усталость"] {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+            color: #8b5cf6;
+        }
+
+        .mood-btn.selected i {
+            transform: scale(1.2);
+        }
+
+        .prompt-generator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .btn-prompt {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .btn-prompt:hover {
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        #journalText {
+            min-height: 150px;
+            resize: vertical;
+        }
+    </style>
 </head>
 
 <body class="page-journal">
@@ -31,43 +132,92 @@
 
     <div class="container" style="max-width: 800px; margin-top: 3rem; margin-bottom: 3rem;">
         <div class="stress-tracker" style="text-align: left;">
-            <h2 style="margin-bottom: 20px;"><i class="fas fa-book-open"></i> Дневник эмоций</h2>
-            <p style="margin-bottom: 30px;">Записывайте свои мысли, чтобы освободить разум и проанализировать триггеры
-                стресса.</p>
+            <h2 style="margin-bottom: 15px;"><i class="fas fa-book-open"></i> Дневник эмоций</h2>
+            <p style="margin-bottom: 30px; color: var(--text-muted);">Записывайте свои мысли, чтобы освободить разум и
+                проанализировать триггеры стресса. Выберите настроение ниже.</p>
 
             <form id="journalForm">
-                <div class="form-group">
-                    <label>Как вы себя чувствуете сейчас?</label>
-                    <select id="mood" class="form-control" required
-                        style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
-                        <option value="Спокойно" style="color: #000;">Спокойно</option>
-                        <option value="Тревожно" style="color: #000;">Тревожно</option>
-                        <option value="Грустно" style="color: #000;">Грустно</option>
-                        <option value="Радостно" style="color: #000;">Радостно</option>
-                        <option value="Устало" style="color: #000;">Устало</option>
-                    </select>
+
+                <div class="mood-selector" id="mood-container">
+                    <div class="mood-btn selected" data-mood="Спокойствие">
+                        <i class="fas fa-leaf" style="color: #10b981;"></i>
+                        <span>Спокойствие</span>
+                    </div>
+                    <div class="mood-btn" data-mood="Радость">
+                        <i class="fas fa-sun" style="color: #f59e0b;"></i>
+                        <span>Радость</span>
+                    </div>
+                    <div class="mood-btn" data-mood="Тревога">
+                        <i class="fas fa-bolt" style="color: #ef4444;"></i>
+                        <span>Тревога</span>
+                    </div>
+                    <div class="mood-btn" data-mood="Грусть">
+                        <i class="fas fa-cloud-rain" style="color: #3b82f6;"></i>
+                        <span>Грусть</span>
+                    </div>
+                    <div class="mood-btn" data-mood="Усталость">
+                        <i class="fas fa-battery-quarter" style="color: #8b5cf6;"></i>
+                        <span>Усталость</span>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Опишите ваши мысли:</label>
-                    <textarea id="journalText" class="form-control" placeholder="Я чувствую..." required></textarea>
+                    <div class="prompt-generator">
+                        <label style="margin: 0;">Опишите ваши мысли:</label>
+                        <button type="button" class="btn-prompt" onclick="generatePrompt()">
+                            <i class="fas fa-magic"></i> Не знаю, с чего начать
+                        </button>
+                    </div>
+                    <textarea id="journalText" class="form-control" placeholder="Сегодня я чувствую..."
+                        required></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-hero" style="width: 100%;"><i class="fas fa-save"></i> Сохранить
                     запись</button>
             </form>
+
             <div id="journalResult"
-                style="margin-top: 20px; font-weight: bold; color: var(--secondary-color); display: none;">Запись
-                успешно добавлена!</div>
+                style="margin-top: 20px; font-weight: bold; color: var(--secondary-color); display: none; text-align: center; padding: 15px; border-radius: 10px; background: rgba(16, 185, 129, 0.1);">
+                <i class="fas fa-check-circle"></i> Запись успешно добавлена в ваш дневник!
+            </div>
         </div>
     </div>
 
     <script src="/tranquility/static/js/main.js"></script>
     <script>
+        let currentMood = "Спокойствие";
+
+        // Mood buttons logic
+        document.querySelectorAll('.mood-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                currentMood = this.getAttribute('data-mood');
+            });
+        });
+
+        // Prompt generator logic
+        const prompts = [
+            "Что сегодня вызвало самую сильную эмоциональную реакцию?",
+            "Назовите одно событие, за которое вы сегодня благодарны.",
+            "Какая мысль крутится у вас в голове весь день?",
+            "Если бы ваше текущее состояние было погодой, то какой?",
+            "Какое одно маленькое действие вы можете сделать прямо сейчас, чтобы почувствовать себя лучше?",
+            "Что ваше тело пытается сказать вам прямо сейчас?"
+        ];
+
+        function generatePrompt() {
+            const RandomIndex = Math.floor(Math.random() * prompts.length);
+            const textarea = document.getElementById('journalText');
+            textarea.value = prompts[RandomIndex] + "\\n\\n";
+            textarea.focus();
+        }
+
+        // Form submission
         document.getElementById('journalForm').addEventListener('submit', function (e) {
             e.preventDefault();
             const data = {
-                mood: document.getElementById('mood').value,
+                mood: currentMood,
                 text: document.getElementById('journalText').value
             };
 
@@ -76,12 +226,23 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             }).then(() => {
-                document.getElementById('journalResult').style.display = 'block';
+                const res = document.getElementById('journalResult');
+                res.style.display = 'block';
                 this.reset();
-                setTimeout(() => { document.getElementById('journalResult').style.display = 'none'; }, 3000);
+                document.getElementById('journalText').value = "";
+
+                // Reset mood silently
+                document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+                document.querySelector('.mood-btn[data-mood="Спокойствие"]').classList.add('selected');
+                currentMood = "Спокойствие";
+
+                setTimeout(() => { res.style.display = 'none'; }, 4000);
+            }).catch(err => {
+                console.error("Error saving journal:", err);
             });
         });
     </script>
+    <script src="/tranquility/static/js/v2.js?v=2" defer></script>
 </body>
 
 </html>

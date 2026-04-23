@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Мир спокойствия — детям о чувствах</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#6a4fb8">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=Caveat:wght@600;700&family=Lexend:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'Nunito', system-ui, -apple-system, sans-serif;
+    --purple: #6a4fb8; --purple-deep: #2a1f4a; --purple-soft: #8b6fd4;
+    --pink: #ff8ab6; --yellow: #ffd166; --mint: #b4e5c5;
+    --red-soft: #ff6b8a; --red: #e11d48;
+    --ink: #2a1f4a; --muted: #6a4fb8;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; font-family: var(--font-body); color: var(--ink);
+    background: linear-gradient(180deg, #f4ecff 0%, #ffe4f1 50%, #fff4e6 100%);
+    min-height: 100vh;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; }
+
+  @keyframes twinkle { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
+  @keyframes bob     { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+  @keyframes fly     { 0%{transform:translate(0,0) rotate(0)} 60%{transform:translate(80px,-100px) rotate(30deg);opacity:1} 100%{transform:translate(200px,-260px) rotate(60deg);opacity:0} }
+  @keyframes dot     { 0%,100%{opacity:.3;transform:translateY(0)} 50%{opacity:1;transform:translateY(-3px)} }
+  @keyframes pulse   { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+  @keyframes popIn   { from{opacity:0;transform:scale(.9)} to{opacity:1;transform:scale(1)} }
+  @keyframes sosPulse{ 0%,100%{box-shadow:0 0 0 0 rgba(225,29,72,.5), 0 10px 30px rgba(225,29,72,.4)} 50%{box-shadow:0 0 0 18px rgba(225,29,72,0), 0 10px 30px rgba(225,29,72,.4)} }
+  @keyframes slideUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
+
+  body.big-text { font-size: 18px; }
+  body.high-contrast .content-card { filter: contrast(1.15) saturate(1.15); }
+  body.dyslexia * { font-family: 'Lexend', sans-serif !important; letter-spacing: 0.02em; word-spacing: 0.08em; }
+
+  /* === Header === */
+  .site-header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px); border-bottom: 1.5px solid rgba(106,79,184,0.15);
+  }
+  .header-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 24px;
+  }
+  .site-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 900; font-size: 22px; color: var(--purple-deep); cursor: pointer;
+  }
+  .site-logo-mark {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--purple-soft), var(--purple));
+    color: white; display: grid; place-items: center; font-size: 22px;
+    box-shadow: 0 4px 12px rgba(106,79,184,0.3);
+  }
+  .site-logo-text small {
+    display: block; font-size: 10px; color: var(--muted);
+    font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .site-nav { display: flex; gap: 4px; flex: 1; justify-content: center; }
+  .site-nav button {
+    background: transparent; border: none; font-size: 15px; font-weight: 700;
+    color: var(--muted); padding: 10px 14px; border-radius: 999px; cursor: pointer;
+    transition: all .2s;
+  }
+  .site-nav button:hover { background: rgba(106,79,184,0.08); color: var(--purple-deep); }
+  .site-nav button.active {
+    background: linear-gradient(135deg, var(--purple-soft), var(--purple));
+    color: white; box-shadow: 0 3px 0 rgba(42,31,74,0.2);
+  }
+  .header-right { display: flex; align-items: center; gap: 8px; }
+  .star-chip {
+    background: linear-gradient(135deg, #ffd166, #ffb347); color: var(--purple-deep);
+    padding: 6px 12px; border-radius: 999px; font-weight: 800; font-size: 14px;
+    display: flex; align-items: center; gap: 4px; box-shadow: 0 3px 0 rgba(184,138,46,0.5);
+  }
+  .a11y-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: white; border: 1.5px solid rgba(106,79,184,0.15);
+    display: grid; place-items: center; cursor: pointer; font-weight: 800; font-size: 13px;
+    color: var(--muted); transition: all .2s;
+  }
+  .a11y-btn:hover { background: rgba(106,79,184,0.08); color: var(--purple-deep); }
+  .a11y-btn.active { background: var(--purple); color: white; border-color: var(--purple); }
+  .menu-toggle {
+    display: none; width: 44px; height: 44px; border-radius: 14px;
+    background: white; border: 1.5px solid rgba(106,79,184,0.15);
+    font-size: 20px; cursor: pointer;
+  }
+
+  /* === SOS FAB === */
+  .sos-fab {
+    position: fixed; bottom: 24px; right: 24px;
+    background: linear-gradient(135deg, #ff6b8a, #e11d48);
+    color: white; border: none; border-radius: 999px;
+    padding: 14px 22px; font-weight: 900; font-size: 15px;
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer; z-index: 80;
+    animation: sosPulse 2s ease-in-out infinite;
+    font-family: inherit;
+  }
+  .sos-fab:hover { transform: translateY(-2px); }
+  .sos-fab .sos-ico { font-size: 20px; }
+
+  /* === Main === */
+  main { max-width: 960px; margin: 0 auto; padding: 16px 20px 80px; }
+
+  /* === КОМПАКТНЫЙ hero === */
+  .hero-mini {
+    display: flex; align-items: center; gap: 14px;
+    max-width: 880px; margin: 6px auto 14px;
+    padding: 10px 18px;
+    background: rgba(255,255,255,0.6); backdrop-filter: blur(8px);
+    border-radius: 18px; border: 1.5px solid rgba(106,79,184,0.12);
+  }
+  .hero-mini h1 {
+    font-size: 22px; font-weight: 900; margin: 0; color: var(--purple-deep);
+    line-height: 1.15; flex: 1;
+  }
+  .hero-mini h1 .sparkle { color: #ffd166; }
+  .hero-mini p {
+    margin: 2px 0 0; font-size: 13px; color: var(--muted); line-height: 1.35;
+    max-width: 520px;
+  }
+  .hero-badges { display: flex; gap: 6px; flex-shrink: 0; }
+  .hero-badges span {
+    background: white; border: 1.5px solid rgba(106,79,184,0.15);
+    border-radius: 999px; padding: 5px 11px; font-size: 11px; font-weight: 700;
+    color: var(--muted); white-space: nowrap;
+  }
+  .hero-badges span.danger {
+    background: #fef1f5; border-color: rgba(225,29,72,0.3); color: var(--red);
+    cursor: pointer;
+  }
+  .hero-badges span.danger:hover { background: #fde4ed; }
+
+  .content-stage {
+    background: white; border-radius: 32px;
+    min-height: 640px; height: min(78vh, 880px);
+    overflow: hidden; position: relative;
+    box-shadow: 0 12px 40px rgba(106,79,184,0.12);
+    border: 1.5px solid rgba(106,79,184,0.1);
+  }
+
+  /* === Quick-actions bar (на главной) === */
+  .quick-bar {
+    display: flex; gap: 10px; margin: 0 auto 14px;
+    max-width: 880px; flex-wrap: wrap;
+  }
+  .quick-btn {
+    flex: 1 1 0; min-width: 140px;
+    background: white; border: 1.5px solid rgba(106,79,184,0.15);
+    border-radius: 18px; padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; font-family: inherit;
+    transition: all .2s; text-align: left;
+  }
+  .quick-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(106,79,184,.15); }
+  .quick-btn .qb-ico { font-size: 26px; }
+  .quick-btn .qb-t { font-weight: 800; font-size: 13px; color: var(--purple-deep); }
+  .quick-btn .qb-d { font-size: 11px; color: var(--muted); margin-top: 1px; line-height: 1.3; }
+  .quick-btn.psych   { background: linear-gradient(135deg, #e0f4f7, #c5e7ee); border-color: #80c4d0; }
+  .quick-btn.sos     { background: linear-gradient(135deg, #fde4ed, #fed0dc); border-color: rgba(225,29,72,0.3); }
+  .quick-btn.parent  { background: linear-gradient(135deg, #f4ecff, #e4d4ff); border-color: rgba(139,111,212,0.3); }
+
+  /* === Footer-about button === */
+  .about-btn {
+    position: fixed; bottom: 24px; left: 24px;
+    background: white; border: 1.5px solid rgba(106,79,184,0.2);
+    border-radius: 999px; padding: 8px 14px;
+    font-weight: 800; font-size: 12px; color: var(--purple);
+    cursor: pointer; z-index: 80; font-family: inherit;
+    box-shadow: 0 4px 12px rgba(106,79,184,0.15);
+  }
+  .about-btn:hover { background: #f4ecff; }
+
+  /* === Modal === */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(42,31,74,0.55);
+    backdrop-filter: blur(4px); z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; animation: popIn .2s ease;
+  }
+  .modal-card {
+    background: white; border-radius: 28px; padding: 28px;
+    max-width: 480px; width: 100%; max-height: 88vh; overflow-y: auto;
+    box-shadow: 0 24px 60px rgba(42,31,74,0.4);
+    animation: slideUp .3s cubic-bezier(0.2,0.9,0.4,1.2);
+  }
+  .modal-card h2 { font-size: 24px; margin: 0 0 12px; color: var(--purple-deep); }
+  .modal-card p { color: var(--muted); line-height: 1.55; margin: 8px 0; }
+  .modal-close {
+    background: transparent; border: none; font-size: 24px;
+    cursor: pointer; color: var(--muted); float: right;
+  }
+  .modal-phone {
+    display: flex; align-items: center; gap: 14px;
+    background: #fef1f5; border: 2px solid rgba(225,29,72,0.25);
+    border-radius: 18px; padding: 14px; margin: 10px 0;
+    text-decoration: none; color: var(--purple-deep);
+  }
+  .modal-phone:hover { background: #fde4ed; }
+  .modal-phone-ico {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b8a, #e11d48); color: white;
+    display: grid; place-items: center; font-size: 22px; flex-shrink: 0;
+  }
+  .modal-phone-num { font-size: 20px; font-weight: 900; color: var(--purple-deep); letter-spacing: 0.5px; }
+  .modal-phone-desc { font-size: 12px; color: var(--muted); }
+
+  /* === Mobile === */
+  @media (max-width: 860px) {
+    .site-nav { display: none; }
+    .site-nav.open {
+      display: flex; flex-direction: column;
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: white; padding: 10px; gap: 4px;
+      box-shadow: 0 12px 30px rgba(106,79,184,0.2);
+      border-top: 1.5px solid rgba(106,79,184,0.15);
+    }
+    .site-nav.open button { text-align: left; width: 100%; padding: 12px 16px; }
+    .menu-toggle { display: inline-flex; align-items: center; justify-content: center; }
+    .a11y-btn:not(.first) { display: none; }
+    .header-inner { padding: 10px 14px; gap: 8px; }
+    .site-logo-text small { display: none; }
+    .site-logo { font-size: 18px; }
+    .site-logo-mark { width: 36px; height: 36px; font-size: 18px; }
+    .hero-mini {
+      flex-direction: column; align-items: stretch; padding: 12px 14px;
+      text-align: center; gap: 8px;
+    }
+    .hero-mini h1 { font-size: 18px; }
+    .hero-mini p { font-size: 12px; }
+    .hero-badges { justify-content: center; flex-wrap: wrap; }
+    .quick-bar { flex-direction: column; gap: 8px; }
+    .quick-btn { padding: 10px 12px; }
+    .content-stage { border-radius: 22px; min-height: 540px; height: 74vh; }
+    main { padding: 12px 10px 80px; }
+    .sos-fab { bottom: 14px; right: 14px; padding: 12px 16px; font-size: 13px; }
+    .sos-fab .sos-label { display: none; }
+    .sos-fab { width: 56px; height: 56px; padding: 0; justify-content: center; }
+    .about-btn { bottom: 14px; left: 14px; padding: 6px 10px; font-size: 11px; }
+  }
+  @media (max-width: 480px) {
+    .hero-mini h1 { font-size: 16px; }
+    .content-stage { border-radius: 18px; min-height: 500px; height: 72vh; }
+  }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="site-logo" href="#" onclick="__go('home'); return false;">
+        <div class="site-logo-mark">✦</div>
+        <div class="site-logo-text">Мир спокойствия<small>Детям о чувствах</small></div>
+      </a>
+      <nav class="site-nav" id="siteNav">
+        <button data-screen="home">Главная</button>
+        <button data-screen="journal">Журнал</button>
+        <button data-screen="mila">Мила</button>
+        <button data-screen="breathing">Дыхание</button>
+        <button data-screen="parcels">Посылки</button>
+        <button data-screen="map">Карта</button>
+      </nav>
+      <div class="header-right">
+        <div class="star-chip" id="starChip">⭐ <span id="starCount">7</span></div>
+        <button class="a11y-btn first" title="Крупный текст" onclick="document.body.classList.toggle('big-text'); this.classList.toggle('active');">A+</button>
+        <button class="a11y-btn" title="Высокий контраст" onclick="document.body.classList.toggle('high-contrast'); this.classList.toggle('active');">◐</button>
+        <button class="a11y-btn" title="Дислексия-режим" onclick="document.body.classList.toggle('dyslexia'); this.classList.toggle('active');">Dx</button>
+        <button class="menu-toggle" onclick="document.getElementById('siteNav').classList.toggle('open');">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Компактный hero (только на главной) -->
+  <section id="heroMini" class="hero-mini">
+    <div style="flex:1">
+      <h1>Мир <span class="sparkle">спокойствия</span> ✶</h1>
+      <p>Место, где дети учатся справляться со страхами и тревогой. Мила расскажет сказку, облачко научит дышать.</p>
+    </div>
+    <div class="hero-badges">
+      <span>✨ 6–12 лет</span>
+      <span class="danger" onclick="openSOS()">🆘 Телефон доверия</span>
+    </div>
+  </section>
+
+  <!-- Quick-actions (только на главной) -->
+  <section id="quickBar" class="quick-bar">
+    <button class="quick-btn sos" onclick="openSOS()">
+      <div class="qb-ico">🆘</div>
+      <div><div class="qb-t">Мне страшно — помощь</div><div class="qb-d">Телефон доверия, дыхание, Мила рядом</div></div>
+    </button>
+    <button class="quick-btn psych" onclick="openPsychologist()">
+      <div class="qb-ico">🧑‍🎓</div>
+      <div><div class="qb-t">Школьный психолог</div><div class="qb-d">Запись к специалисту школы №2200</div></div>
+    </button>
+    <button class="quick-btn parent" onclick="openFamilyLink()">
+      <div class="qb-ico">👨‍👩‍👧</div>
+      <div><div class="qb-t">Связать с родителем</div><div class="qb-d">Или вход через код от родителя</div></div>
+    </button>
+  </section>
+
+  <main>
+    <div class="content-stage" id="root"></div>
+  </main>
+
+  <!-- Плавающие кнопки -->
+  <button class="sos-fab" onclick="openSOS()"><span class="sos-ico">🆘</span><span class="sos-label">Мне страшно</span></button>
+  <button class="about-btn" onclick="openAbout()">ℹ О проекте</button>
+
+  <!-- Модалки (ванильные, без React) -->
+  <div id="modalRoot"></div>
+
+  <script>
+    // === Модалки ===
+    function closeModal(){ document.getElementById('modalRoot').innerHTML = ''; }
+    function openModal(html){
+      document.getElementById('modalRoot').innerHTML =
+        '<div class="modal-backdrop" onclick="if(event.target===this)closeModal()">'
+        + '<div class="modal-card">' + html + '</div></div>';
+    }
+
+    window.openSOS = function(){
+      openModal(`
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <h2>🆘 Ты не один</h2>
+        <p>Всё, что ты чувствуешь, — важно. Если прямо сейчас страшно, грустно или обидно — позвони или напиши. Бесплатно и анонимно.</p>
+        <a class="modal-phone" href="tel:88002000122">
+          <div class="modal-phone-ico">📞</div>
+          <div><div class="modal-phone-num">8-800-2000-122</div><div class="modal-phone-desc">Детский телефон доверия · круглосуточно</div></div>
+        </a>
+        <a class="modal-phone" href="tel:112">
+          <div class="modal-phone-ico">🚨</div>
+          <div><div class="modal-phone-num">112</div><div class="modal-phone-desc">Срочная служба (если угроза жизни)</div></div>
+        </a>
+        <a class="modal-phone" href="tel:88007070222">
+          <div class="modal-phone-ico">💬</div>
+          <div><div class="modal-phone-num">8-800-707-02-22</div><div class="modal-phone-desc">Помощь подросткам и родителям</div></div>
+        </a>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button onclick="closeModal(); __go('breathing')" style="flex:1;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#70b3ff,#8b6fd4);color:#fff;font-weight:800;cursor:pointer;font-family:inherit">☁️ Подышим вместе</button>
+          <button onclick="closeModal(); __go('mila')" style="flex:1;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#ffd166,#ffb347);color:#2a1f4a;font-weight:800;cursor:pointer;font-family:inherit">🐱 К Миле</button>
+        </div>
+      `);
+    };
+
+    window.openPsychologist = function(){
+      openModal(`
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <h2>🧑‍🎓 Школьный психолог</h2>
+        <p>В нашей школе работает психолог. С ним можно поговорить про школу, друзей, тревогу, ссоры дома — о чём угодно. Разговор конфиденциален.</p>
+        <div style="background:#e0f4f7;border:2px solid #80c4d0;border-radius:18px;padding:16px;margin:12px 0">
+          <div style="font-size:22px;font-weight:900;color:#2a1f4a">Неумоина Галина Сергеевна</div>
+          <div style="font-size:13px;color:#6a4fb8;margin-top:4px">Педагог-психолог · ГБОУ Школа 2200</div>
+          <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;font-size:14px">
+            <div>📍 <b>Кабинет 214</b> (2 этаж)</div>
+            <div>🕐 <b>Пн–Пт</b>, 09:00–16:00</div>
+            <div>📧 <a href="mailto:psycholog@school2200.ru" style="color:#6a4fb8;font-weight:700">psycholog@school2200.ru</a></div>
+            <div>📞 <a href="tel:+74951234567" style="color:#6a4fb8;font-weight:700">+7 (495) 123-45-67</a></div>
+          </div>
+        </div>
+        <p style="font-size:13px">Можно прийти без записи — или попросить классного руководителя помочь записаться. Родителям тоже можно!</p>
+        <button onclick="closeModal()" style="width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#70b3ff,#8b6fd4);color:#fff;font-weight:800;cursor:pointer;font-family:inherit;margin-top:10px">Понятно 👍</button>
+      `);
+    };
+
+    window.openAbout = function(){
+      openModal(`
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <h2>О проекте</h2>
+        <p><b>Мир спокойствия</b> — учебный проект для конференции «Инженеры будущего» 2026.</p>
+        <p style="font-size:13px">Цель — помочь детям 6–12 лет научиться справляться со страхами, тревогой и сильными чувствами через игру, дыхательные техники и общение с героиней-кошкой Милой.</p>
+        <div style="background:#f4ecff;border-radius:14px;padding:14px;margin:12px 0;font-size:13px;line-height:1.6">
+          <div><b>Авторы:</b></div>
+          <div>• Почкина Анастасия Александровна (10С)</div>
+          <div>• Алексинская Таисия Николаевна (10С)</div>
+          <div style="margin-top:8px"><b>Руководитель:</b> Неумоин Павел Дмитриевич</div>
+          <div style="margin-top:8px"><b>Школа:</b> ГБОУ Школа 2200, Москва</div>
+        </div>
+        <p style="font-size:12px;color:#8b6fd4">© 2026 Мир спокойствия</p>
+        <button onclick="closeModal()" style="width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#8b6fd4,#6a4fb8);color:#fff;font-weight:800;cursor:pointer;font-family:inherit;margin-top:6px">Закрыть</button>
+      `);
+    };
+
+    // === Генератор кодов связи «ребёнок ↔ родитель» ===
+    function mkCode(){
+      const abc = 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЭЮЯ';
+      let c = '';
+      for(let i=0;i<4;i++) c += abc[Math.floor(Math.random()*abc.length)];
+      return c + '-' + Math.floor(1000+Math.random()*9000);
+    }
+
+    window.openFamilyLink = function(){
+      const existing = localStorage.getItem('family_code');
+      const role = localStorage.getItem('user_role'); // 'child' | 'parent' | null
+      let body;
+      if(!role){
+        body = `
+          <button class="modal-close" onclick="closeModal()">✕</button>
+          <h2>👋 Привет! Кто ты?</h2>
+          <p>Выбери роль — будем работать в твоём режиме.</p>
+          <div style="display:flex;gap:10px;margin-top:10px">
+            <button onclick="pickRole('child')" style="flex:1;padding:18px;border-radius:18px;border:2px solid rgba(106,79,184,0.2);background:linear-gradient(135deg,#fff4d9,#ffe8a3);cursor:pointer;font-family:inherit">
+              <div style="font-size:38px">🧒</div>
+              <div style="font-weight:900;color:#2a1f4a;margin-top:4px">Я ребёнок</div>
+              <div style="font-size:11px;color:#6a4fb8">получу код для родителя</div>
+            </button>
+            <button onclick="pickRole('parent')" style="flex:1;padding:18px;border-radius:18px;border:2px solid rgba(106,79,184,0.2);background:linear-gradient(135deg,#e0f4f7,#c5e7ee);cursor:pointer;font-family:inherit">
+              <div style="font-size:38px">👨‍👩‍👧</div>
+              <div style="font-weight:900;color:#2a1f4a;margin-top:4px">Я родитель</div>
+              <div style="font-size:11px;color:#6a4fb8">введу код ребёнка</div>
+            </button>
+          </div>
+        `;
+      } else if(role === 'child'){
+        const code = existing || mkCode();
+        if(!existing) localStorage.setItem('family_code', code);
+        body = `
+          <button class="modal-close" onclick="closeModal()">✕</button>
+          <h2>👨‍👩‍👧 Твой код для родителя</h2>
+          <p style="font-size:13px">Покажи этот код маме или папе — они введут его в своём приложении и смогут видеть твой прогресс.</p>
+          <div style="background:linear-gradient(135deg,#fff4d9,#ffe8a3);border:3px dashed #ffd166;border-radius:20px;padding:24px;text-align:center;margin:14px 0">
+            <div style="font-size:12px;color:#8b6fd4;font-weight:700;text-transform:uppercase;letter-spacing:1px">код связи</div>
+            <div style="font-size:38px;font-weight:900;color:#2a1f4a;letter-spacing:4px;margin-top:4px;font-family:monospace">${code}</div>
+          </div>
+          <p style="font-size:12px;color:#8b6fd4">Код постоянный — не меняется.</p>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button onclick="navigator.clipboard.writeText('${code}'); this.textContent='✓ Скопировано'" style="flex:1;padding:12px;border-radius:14px;border:1.5px solid rgba(106,79,184,0.2);background:#fff;color:#6a4fb8;font-weight:800;cursor:pointer;font-family:inherit">📋 Скопировать</button>
+            <button onclick="resetRole()" style="padding:12px 16px;border-radius:14px;border:1.5px solid rgba(106,79,184,0.2);background:#fff;color:#6a4fb8;font-weight:800;cursor:pointer;font-family:inherit">Сменить роль</button>
+          </div>
+        `;
+      } else {
+        const linked = localStorage.getItem('linked_child_code');
+        if(linked){
+          body = `
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <h2>👨‍👩‍👧 Вы подключены</h2>
+            <p>Ребёнок связан. Вы видите его прогресс в разделе «Для родителей».</p>
+            <div style="background:#e0f4f7;border:2px solid #80c4d0;border-radius:18px;padding:16px;margin:12px 0;text-align:center">
+              <div style="font-size:12px;color:#8b6fd4;font-weight:700;text-transform:uppercase">связь</div>
+              <div style="font-size:24px;font-weight:900;color:#2a1f4a;letter-spacing:3px;font-family:monospace;margin-top:4px">${linked}</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button onclick="closeModal(); __go('parent')" style="flex:1;padding:12px;border-radius:14px;border:none;background:linear-gradient(135deg,#70b3ff,#8b6fd4);color:#fff;font-weight:800;cursor:pointer;font-family:inherit">📊 Отчёт ребёнка</button>
+              <button onclick="localStorage.removeItem('linked_child_code'); openFamilyLink()" style="padding:12px 16px;border-radius:14px;border:1.5px solid rgba(106,79,184,0.2);background:#fff;color:#6a4fb8;font-weight:800;cursor:pointer;font-family:inherit">Отвязать</button>
+            </div>
+          `;
+        } else {
+          body = `
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <h2>👨‍👩‍👧 Введите код ребёнка</h2>
+            <p style="font-size:13px">Попросите ребёнка открыть приложение и нажать «Связать с родителем» — он увидит код.</p>
+            <input id="famCodeInput" placeholder="АБВГ-1234" maxlength="9" style="width:100%;padding:16px;border:2px solid rgba(106,79,184,0.2);border-radius:14px;font-size:22px;font-weight:900;text-align:center;letter-spacing:3px;font-family:monospace;margin:14px 0;text-transform:uppercase;color:#2a1f4a" oninput="this.value=this.value.toUpperCase()"/>
+            <button onclick="submitFamilyCode()" style="width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#8b6fd4,#6a4fb8);color:#fff;font-weight:800;cursor:pointer;font-family:inherit">Подключить →</button>
+            <button onclick="resetRole()" style="width:100%;padding:10px;border-radius:14px;border:none;background:transparent;color:#8b6fd4;cursor:pointer;margin-top:6px;font-family:inherit">← Я не родитель</button>
+          `;
+        }
+      }
+      openModal(body);
+    };
+
+    window.pickRole = function(r){ localStorage.setItem('user_role', r); openFamilyLink(); };
+    window.resetRole = function(){ localStorage.removeItem('user_role'); openFamilyLink(); };
+    window.submitFamilyCode = function(){
+      const v = document.getElementById('famCodeInput').value.trim();
+      if(!/^[А-ЯA-Z]{4}-\d{4}$/.test(v)){
+        alert('Код должен быть вида АБВГ-1234');
+        return;
+      }
+      localStorage.setItem('linked_child_code', v);
+      openFamilyLink();
+    };
+
+    // === Site-nav ===
+    window.__go = function(screen) {
+      if (window.__setScreen) window.__setScreen(screen);
+      document.querySelectorAll('.site-nav button').forEach(b => {
+        b.classList.toggle('active', b.dataset.screen === screen);
+      });
+      // скрываем hero + quick-bar только на нестартовых экранах
+      const show = (screen === 'home');
+      document.getElementById('heroMini').style.display = show ? '' : 'none';
+      document.getElementById('quickBar').style.display = show ? '' : 'none';
+      document.getElementById('siteNav').classList.remove('open');
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    };
+    document.querySelectorAll('.site-nav button').forEach(b => {
+      b.addEventListener('click', () => window.__go(b.dataset.screen));
+    });
+  </script>
+
+  <script type="text/babel" src="mila.jsx"></script>
+  <script type="text/babel" src="ui.jsx"></script>
+  <script type="text/babel" src="app-enhance.jsx"></script>
+  <script type="text/babel" src="screens/home.jsx"></script>
+  <script type="text/babel" src="screens/journal.jsx"></script>
+  <script type="text/babel" src="screens/mila-chat.jsx"></script>
+  <script type="text/babel" src="screens/breathing.jsx"></script>
+  <script type="text/babel" src="screens/parcels.jsx"></script>
+  <script type="text/babel" src="screens/other.jsx"></script>
+  <script type="text/babel" src="map-v5.jsx"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function App() {
+      const [screen, setScreen] = useState('home');
+      const [stars, setStars] = useState(parseInt(localStorage.getItem('stars') || '7'));
+      const [helpCount, setHelpCount] = useState(parseInt(localStorage.getItem('helpCount') || '5'));
+      const [friends, setFriends] = useState(3);
+      const [childName, setChildName] = useState(localStorage.getItem('childName') || 'друг');
+      const [parcels, setParcels] = useState(INITIAL_PARCELS);
+      const [currentParcel, setCurrentParcel] = useState(null);
+
+      useEffect(() => {
+        window.__setScreen = (s) => setScreen(s);
+      }, []);
+
+      useEffect(() => {
+        document.querySelectorAll('.site-nav button').forEach(b => {
+          b.classList.toggle('active', b.dataset.screen === screen);
+        });
+        const show = (screen === 'home');
+        const hero = document.getElementById('heroMini');
+        const qb = document.getElementById('quickBar');
+        if (hero) hero.style.display = show ? '' : 'none';
+        if (qb) qb.style.display = show ? '' : 'none';
+      }, [screen]);
+
+      useEffect(() => {
+        const el = document.getElementById('starCount');
+        if (el) el.textContent = stars;
+        localStorage.setItem('stars', String(stars));
+      }, [stars]);
+
+      useEffect(() => { localStorage.setItem('helpCount', String(helpCount)); }, [helpCount]);
+
+      const addStar = () => setStars(s => s + 1);
+
+      let content;
+      switch(screen) {
+        case 'home':
+          content = <HomeScreen onNav={setScreen} stars={stars} helpCount={helpCount} childName={childName} onSOS={() => window.openSOS()}/>;
+          break;
+        case 'journal':
+          content = <JournalScreen onNav={setScreen} addStar={addStar}/>;
+          break;
+        case 'mila':
+          content = <MilaChat onNav={setScreen} addStar={addStar}/>;
+          break;
+        case 'breathing':
+          content = <BreathingScreen onNav={setScreen} addStar={addStar}/>;
+          break;
+        case 'parcels':
+          content = <ParcelsInbox
+            onNav={setScreen} parcels={parcels} helpCount={helpCount}
+            onOpen={(p) => { setCurrentParcel(p); setScreen('parcel-open'); }}
+            onSend={() => setScreen('parcels-send')}/>;
+          break;
+        case 'parcel-open':
+          content = <ParcelOpen parcel={currentParcel}
+            onBack={() => setScreen('parcels')}
+            onThank={() => { setParcels(parcels.map(p => p.id === currentParcel.id ? {...p, thanked: true} : p)); addStar(); setScreen('parcels'); }}
+            onTry={() => setScreen('breathing')}/>;
+          break;
+        case 'parcels-send':
+          content = <ParcelSend onBack={() => setScreen('parcels')}
+            onSent={() => { setHelpCount(c => c + 1); addStar(); setScreen('home'); }}/>;
+          break;
+        case 'techniques':
+          content = <TechniquesScreen onNav={setScreen}/>;
+          break;
+        case 'map':
+          content = <MapScreen onNav={setScreen} stars={stars} friends={friends} helpCount={helpCount}/>;
+          break;
+        case 'sos':
+          content = <SOSScreen onNav={setScreen}/>;
+          break;
+        case 'parent':
+          content = <ParentScreen onNav={setScreen} childName={childName}/>;
+          break;
+        default:
+          content = <HomeScreen onNav={setScreen} stars={stars} helpCount={helpCount} childName={childName} onSOS={() => window.openSOS()}/>;
+      }
+      return content;
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>

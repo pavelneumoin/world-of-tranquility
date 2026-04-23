@@ -7,6 +7,7 @@
     <title>Мир спокойствия - Аудио-терапия</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/tranquility/static/css/style.css">
+    <link rel="stylesheet" href="/tranquility/static/css/v2.css?v=2">
     <style>
         .player-grid {
             display: grid;
@@ -149,8 +150,7 @@
             <div class="sound-card">
                 <i class="fas fa-cloud-rain sound-icon ic-rain"></i>
                 <h3 class="sound-title">Шум летнего дождя</h3>
-                <audio id="audio-rain" loop
-                    src="https://assets.mixkit.co/active_storage/sfx/1252/1252-preview.mp3"></audio>
+                <audio id="audio-rain" loop src="/tranquility/static/media/rain.m4a"></audio>
                 <button class="play-btn" onclick="toggleSound('rain')"><i class="fas fa-play"
                         id="icon-rain"></i></button>
                 <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.5"
@@ -161,8 +161,7 @@
             <div class="sound-card">
                 <i class="fas fa-tree sound-icon ic-forest"></i>
                 <h3 class="sound-title">Утренний лес</h3>
-                <audio id="audio-forest" loop
-                    src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+                <audio id="audio-forest" loop src="/tranquility/static/media/forest.m4a"></audio>
                 <button class="play-btn" onclick="toggleSound('forest')"><i class="fas fa-play"
                         id="icon-forest"></i></button>
                 <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.5"
@@ -173,8 +172,7 @@
             <div class="sound-card">
                 <i class="fas fa-fire sound-icon ic-fire"></i>
                 <h3 class="sound-title">Камин в хижине</h3>
-                <audio id="audio-fire" loop
-                    src="https://assets.mixkit.co/active_storage/sfx/1284/1284-preview.mp3"></audio>
+                <audio id="audio-fire" loop src="/tranquility/static/media/fire.m4a"></audio>
                 <button class="play-btn" onclick="toggleSound('fire')"><i class="fas fa-play"
                         id="icon-fire"></i></button>
                 <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.5"
@@ -185,12 +183,57 @@
             <div class="sound-card">
                 <i class="fas fa-water sound-icon ic-ocean"></i>
                 <h3 class="sound-title">Океанский бриз</h3>
-                <audio id="audio-ocean" loop
-                    src="https://assets.mixkit.co/active_storage/sfx/1195/1195-preview.mp3"></audio>
+                <audio id="audio-ocean" loop src="/tranquility/static/media/ocean.m4a"></audio>
                 <button class="play-btn" onclick="toggleSound('ocean')"><i class="fas fa-play"
                         id="icon-ocean"></i></button>
                 <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.5"
                     onchange="setVolume('ocean', this.value)">
+            </div>
+            <!-- Звук 5 -->
+            <div class="sound-card">
+                <i class="fas fa-om sound-icon"
+                    style="background: linear-gradient(135deg, #a855f7, #d8b4fe); -webkit-background-clip: text;"></i>
+                <h3 class="sound-title">Дзен-медитация</h3>
+                <audio id="audio-zen" loop src="/tranquility/static/media/zen.m4a"></audio>
+                <button class="play-btn" onclick="toggleSound('zen')"><i class="fas fa-play" id="icon-zen"></i></button>
+                <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.5"
+                    onchange="setVolume('zen', this.value)">
+            </div>
+
+            <!-- Звук 6 -->
+            <div class="sound-card">
+                <i class="fas fa-water sound-icon"
+                    style="background: linear-gradient(135deg, #0284c7, #7dd3fc); -webkit-background-clip: text;"></i>
+                <h3 class="sound-title">Ручей в горах</h3>
+                <audio id="audio-stream" loop src="/tranquility/static/media/stream.m4a"></audio>
+                <button class="play-btn" onclick="toggleSound('stream')"><i class="fas fa-play"
+                        id="icon-stream"></i></button>
+                <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.5"
+                    onchange="setVolume('stream', this.value)">
+            </div>
+
+            <!-- Звук 7 -->
+            <div class="sound-card">
+                <i class="fas fa-wind sound-icon"
+                    style="background: linear-gradient(135deg, #94a3b8, #cbd5e1); -webkit-background-clip: text;"></i>
+                <h3 class="sound-title">Белый шум</h3>
+                <audio id="audio-white_noise" loop src="/tranquility/static/media/white_noise.m4a"></audio>
+                <button class="play-btn" onclick="toggleSound('white_noise')"><i class="fas fa-play"
+                        id="icon-white_noise"></i></button>
+                <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.5"
+                    onchange="setVolume('white_noise', this.value)">
+            </div>
+
+            <!-- Звук 8 -->
+            <div class="sound-card">
+                <i class="fas fa-music sound-icon"
+                    style="background: linear-gradient(135deg, #ec4899, #f9a8d4); -webkit-background-clip: text;"></i>
+                <h3 class="sound-title">Музыка</h3>
+                <audio id="audio-meditatively" loop src="/tranquility/static/media/meditatively.m4a"></audio>
+                <button class="play-btn" onclick="toggleSound('meditatively')"><i class="fas fa-play"
+                        id="icon-meditatively"></i></button>
+                <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.5"
+                    onchange="setVolume('meditatively', this.value)">
             </div>
         </div>
 
@@ -203,7 +246,7 @@
 
     <script src="/tranquility/static/js/main.js"></script>
     <script>
-        const sounds = ['rain', 'forest', 'fire', 'ocean'];
+        const sounds = ['rain', 'forest', 'fire', 'ocean', 'zen', 'stream', 'white_noise', 'meditatively'];
 
         function toggleSound(id) {
             const audio = document.getElementById(`audio-${id}`);
@@ -237,6 +280,7 @@
             });
         }
     </script>
+    <script src="/tranquility/static/js/v2.js?v=2" defer></script>
 </body>
 
 </html>
